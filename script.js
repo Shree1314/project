@@ -15,8 +15,14 @@ function showView(viewId) {
     }
 
     if(viewId === 'view-fan-dash') applyEvacuationStateToFan();
-    if(viewId === 'view-mgmt-dash') startGraph();
-    else stopGraph();
+    
+    if(viewId === 'view-mgmt-dash') {
+        startGraph();
+        startAILogs(); // Start generating live AI data
+    } else {
+        stopGraph();
+        stopAILogs();
+    }
 }
 
 // --- LOGIN LOGIC ---
@@ -47,11 +53,13 @@ function triggerEvacuation() {
     const confirmEvac = confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?");
     if(confirmEvac) {
         globalEvacuationState = true;
-        document.getElementById('evac-banner').style.display = 'block';
-        const logBox = document.getElementById('aiLogBox');
-        const time = new Date().toLocaleTimeString().split(' ')[0];
-        logBox.innerHTML += `<div class="ai-msg warning" style="color:var(--danger); border-color:var(--danger);"><span class="time">[${time}]</span> SYSTEM OVERRIDE: Evacuation Triggered by Command.</div>`;
-        logBox.scrollTop = logBox.scrollHeight;
+        
+        // Show Global Banner
+        const banner = document.getElementById('evac-banner');
+        banner.style.display = 'block';
+        banner.classList.add('glitch-text'); // Add CSS glitch animation
+        
+        addAILog("SYSTEM OVERRIDE: Evacuation Triggered by Command.", "danger");
         alert("Protocol Initiated. All Smart Passes synced to Evacuation Mode.");
     }
 }
@@ -68,18 +76,93 @@ function applyEvacuationStateToFan() {
     }
 }
 
-// --- LIVE GRAPH ANIMATION ---
+// --- NEW: DYNAMIC AI LOG GENERATOR ---
+let aiLogInterval;
+const logPhrases = [
+    "Recalibrating spatial grid mapping...",
+    "Thermal sensors indicate optimal temperatures in Sector B.",
+    "Gate 4 throughput steady at 12 fans/min.",
+    "Anomaly detected in VIP lounge. Re-routing staff.",
+    "Drone swarm 2 returning for battery cycle.",
+    "Concession Stand 3 reports low beverage inventory.",
+    "Predictive model shows 4% increase in exiting traffic next over.",
+    "Network handshake secure with Local Metro Transit API."
+];
+
+function addAILog(message, type = "normal") {
+    const logBox = document.getElementById('aiLogBox');
+    if(!logBox) return;
+
+    const now = new Date();
+    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+    
+    let colorClass = "";
+    if (type === "warning") colorClass = "warning";
+    if (type === "danger") colorClass = "danger";
+
+    const logHTML = `<div class="ai-msg ${colorClass}"><span class="time">[${timeString}]</span> ${message}</div>`;
+    
+    logBox.innerHTML += logHTML;
+    
+    // Keep only the last 50 logs to prevent memory issues
+    if (logBox.children.length > 50) {
+        logBox.removeChild(logBox.firstChild);
+    }
+
+    // Auto-scroll to bottom smoothly
+    logBox.scrollTo({ top: logBox.scrollHeight, behavior: 'smooth' });
+}
+
+function startAILogs() {
+    // Clear existing static logs
+    const logBox = document.getElementById('aiLogBox');
+    if(logBox) logBox.innerHTML = '';
+    
+    addAILog("System boot sequence initialized.");
+    addAILog("Real-time spatial tracking online.");
+
+    aiLogInterval = setInterval(() => {
+        if(globalEvacuationState) return; // Stop random logs during emergency
+        
+        // Randomly pick a phrase
+        const randomPhrase = logPhrases[Math.floor(Math.random() * logPhrases.length)];
+        
+        // 10% chance to be a warning
+        const isWarning = Math.random() > 0.9;
+        addAILog(randomPhrase, isWarning ? "warning" : "normal");
+
+    }, 4000 + Math.random() * 4000); // Random interval between 4 to 8 seconds
+}
+
+function stopAILogs() {
+    if(aiLogInterval) clearInterval(aiLogInterval);
+}
+
+// --- SMOOTH LIVE GRAPH ANIMATION ---
 let graphInterval;
 function startGraph() {
     const canvas = document.getElementById('ingress-graph');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    const data = Array.from({length: 40}, () => Math.random() * 40 + 20);
+    
+    // Start with a smooth baseline
+    let data = Array.from({length: 40}, () => 40);
+    let currentTarget = 40;
 
     graphInterval = setInterval(() => {
-        data.shift(); data.push(Math.random() * 40 + 20); 
+        // Smooth target seeking algorithm (looks much better than random jumps)
+        if(Math.random() > 0.8) currentTarget = Math.random() * 50 + 10; // Change target occasionally
+        
+        // Smoothly move the last data point toward the target
+        let lastVal = data[data.length - 1];
+        let nextVal = lastVal + (currentTarget - lastVal) * 0.2;
+        
+        data.shift(); 
+        data.push(nextVal); 
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath(); ctx.strokeStyle = '#39FF88'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+        
         const widthStep = canvas.width / (data.length - 1);
         
         for(let i = 0; i < data.length; i++) {
@@ -91,7 +174,9 @@ function startGraph() {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, 'rgba(57, 255, 136, 0.25)'); gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
         ctx.fillStyle = gradient; ctx.fill();
-    }, 1000); 
+    }, 500); // Update much faster (500ms) for smoother animation
 }
 
-function stopGraph() { if(graphInterval) clearInterval(graphInterval); }
+function stopGraph() { 
+    if(graphInterval) clearInterval(graphInterval); 
+}
