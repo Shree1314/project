@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Stadium Portal</title>
+    <style>
+        /* ==========================================
+           STRICT 60-30-10 COLOR PALETTE
+           60% Charcoal Black  : #121212 (Backgrounds)
+           30% Steel Blue      : #2B4865 (Panels, Cards, Navbars)
+           10% Vibrant Orange  : #FF8C32 (Buttons, Accents, Alerts)
+           ========================================== */
+        :root {
+            --bg-60: #121212;
+            --panel-30: #2B4865;
+            --accent-10: #FF8C32;
+            --text-light: #ffffff;
+            --text-muted: #b0c4de;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background-color: var(--bg-60);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVBAR (30%) */
+        .navbar {
+            background-color: var(--panel-30);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent-10); /* 10% Accent */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .navbar h1 { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+        .logout-btn {
+            background: transparent; border: 1px solid var(--accent-10); color: var(--accent-10);
+            padding: 5px 15px; border-radius: 4px; cursor: pointer; display: none; transition: 0.3s;
+        }
+        .logout-btn:hover { background: var(--accent-10); color: var(--bg-60); }
+
+        /* CONTAINERS */
+        .container { flex: 1; padding: 40px 20px; display: flex; justify-content: center; align-items: center; }
+        .view { display: none; width: 100%; max-width: 1000px; animation: fadeIn 0.4s ease; }
+        .view.active { display: block; }
+
+        /* CARDS & PANELS (30%) */
+        .card {
+            background-color: var(--panel-30);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* FORMS & INPUTS */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 14px; text-transform: uppercase; }
+        .form-group input {
+            width: 100%; padding: 12px; border: none; border-radius: 6px;
+            background-color: var(--bg-60); color: var(--text-light);
+            border-left: 4px solid var(--accent-10);
+        }
+        .form-group input:focus { outline: none; box-shadow: 0 0 8px rgba(255, 140, 50, 0.4); }
+
+        /* BUTTONS (10%) */
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 6px;
+            background-color: var(--accent-10); color: var(--bg-60);
+            font-size: 16px; font-weight: 800; text-transform: uppercase;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 140, 50, 0.4); }
+        .btn-secondary { background-color: transparent; border: 2px solid var(--accent-10); color: var(--accent-10); margin-top: 15px;}
+        .btn-secondary:hover { background-color: var(--accent-10); color: var(--bg-60); }
+
+        /* GRID LAYOUTS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        /* DASHBOARD ELEMENTS */
+        .dash-header { margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        
+        .stat-box { background: var(--bg-60); padding: 15px; border-radius: 8px; text-align: center; border-bottom: 3px solid var(--accent-10); }
+        .stat-box h3 { color: var(--text-muted); font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-box .value { font-size: 24px; font-weight: bold; color: var(--accent-10); }
+
+        .ai-log { background: var(--bg-60); padding: 15px; border-radius: 8px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: var(--text-muted); }
+        .ai-msg { margin-bottom: 10px; border-left: 2px solid var(--accent-10); padding-left: 10px; }
+        .ai-msg.alert { color: var(--accent-10); font-weight: bold; }
+
+        /* EVACUATION STYLES */
+        .evac-btn { background-color: #ff3333; color: white; animation: pulse 2s infinite; }
+        .evac-banner {
+            display: none; background-color: #ff3333; color: white; text-align: center;
+            padding: 20px; font-size: 24px; font-weight: 900; letter-spacing: 2px;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 51, 51, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); } }
+        @keyframes flash { 0% { background-color: #ff3333; } 50% { background-color: #990000; } 100% { background-color: #ff3333; } }
+    </style>
+</head>
+<body>
+
+    <div id="evac-banner" class="evac-banner">
+        ⚠ EMERGENCY EVACUATION: PLEASE PROCEED TO THE NEAREST EXIT IMMEDIATELY ⚠
+    </div>
+
+    <div class="navbar">
+        <h1>STADIUM<span style="color: var(--accent-10);">SYNC</span></h1>
+        <button id="logoutBtn" class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        
+        <div id="view-selector" class="view active">
+            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+                <h2 style="margin-bottom: 30px; font-size: 22px;">Welcome to the Stadium</h2>
+                <button class="btn" onclick="showView('view-fan-login')">Fan / Customer Portal</button>
+                <button class="btn btn-secondary" onclick="showView('view-mgmt-login')">Management Command</button>
+            </div>
+        </div>
+
+        <div id="view-fan-login" class="view">
+            <div class="card" style="max-width: 400px; margin: 0 auto;">
+                <h2 class="dash-header">Fan Portal Login</h2>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fanName" placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Ticket Number</label>
+                    <input type="text" id="fanTicket" placeholder="e.g. TKT-8493">
+                </div>
+                <button class="btn" onclick="loginFan()">Access Smart Pass</button>
+                <button class="btn btn-secondary" style="padding: 10px; font-size: 12px;" onclick="showView('view-selector')">Back</button>
+            </div>
+        </div>
+
+        <div id="view-mgmt-login" class="view">
+            <div class="card" style="max-width: 400px; margin: 0 auto;">
+                <h2 class="dash-header">Command Center Login</h2>
+                <div class="form-group">
+                    <label>Admin PIN (Hint: 1234)</label>
+                    <input type="password" id="adminPin" placeholder="****">
+                </div>
+                <button class="btn" onclick="loginMgmt()">Authenticate</button>
+                <button class="btn btn-secondary" style="padding: 10px; font-size: 12px;" onclick="showView('view-selector')">Back</button>
+            </div>
+        </div>
+
+        <div id="view-fan-dash" class="view">
+            <div class="card">
+                <h2 class="dash-header">Hello, <span id="displayFanName" style="color: var(--accent-10);">Fan</span></h2>
+                
+                <div id="normal-fan-view" class="grid-2">
+                    <div>
+                        <div class="stat-box" style="margin-bottom: 20px;">
+                            <h3>Your Ticket Number</h3>
+                            <div class="value" id="displayFanTicket" style="font-size: 18px; color: var(--text-light);">TKT-000</div>
+                        </div>
+                        <div class="stat-box">
+                            <h3>Assigned Entry</h3>
+                            <div class="value">GATE 3</div>
+                            <p style="font-size: 12px; color: #10b981; margin-top: 5px;">Status: Clear</p>
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-60); padding: 20px; border-radius: 8px;">
+                        <h3 style="color: var(--accent-10); margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">AI Virtual Assistant</h3>
+                        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">
+                            Welcome to the match! Gate 3 is currently experiencing low traffic. Expected security wait time is 2 minutes. Enjoy the game!
+                        </p>
+                        <button class="btn btn-secondary" onclick="alert('Support staff dispatched to your location.')">Request Assistance</button>
+                    </div>
+                </div>
+
+                <div id="evac-fan-view" style="display: none; text-align: center; padding: 30px;">
+                    <h1 style="color: #ff3333; font-size: 40px; margin-bottom: 20px;">⚠ EVACUATE ⚠</h1>
+                    <p style="font-size: 18px;">Please leave your belongings and walk calmly to the nearest open exit. Follow staff instructions.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-mgmt-dash" class="view">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;" class="dash-header">
+                    <h2>Live Crowd Command</h2>
+                    <span style="background: var(--bg-60); padding: 5px 10px; border-radius: 4px; font-size: 12px; border: 1px solid #10b981; color: #10b981;">SYSTEM ONLINE</span>
+                </div>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--text-muted); font-size: 12px; text-transform: uppercase; margin-bottom: 10px;">Turnstile Traffic</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="stat-box"><h3>Gate 1</h3><div class="value" style="color: #10b981;">45</div></div>
+                            <div class="stat-box"><h3>Gate 2</h3><div class="value" style="color: var(--accent-10);">128</div></div>
+                            <div class="stat-box"><h3>Gate 3</h3><div class="value" style="color: #10b981;">12</div></div>
+                            <div class="stat-box"><h3>Gate 4</h3><div class="value" style="color: #10b981;">67</div></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="color: var(--text-muted); font-size: 12px; text-transform: uppercase; margin-bottom: 10px;">AI Predictive Logs</h3>
+                        <div class="ai-log" id="aiLogBox">
+                            <div class="ai-msg">[18:00] System boot successful.</div>
+                            <div class="ai-msg">[18:05] Routine ingress tracking started.</div>
+                            <div class="ai-msg alert">[18:12] PREDICTION: Gate 2 will congest in 10 mins. Redirecting Fan App traffic to Gate 3.</div>
+                            <div class="ai-msg">[18:15] VIP lane utilization at 14%.</div>
+                        </div>
+                        
+                        <button class="btn evac-btn" style="margin-top: 15px;" onclick="triggerEvacuation()">⚠ TRIGGER EVACUATION PROTOCOL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- GLOBAL SYSTEM STATE ---
+        let globalEvacuationState = false;
+
+        // --- ROUTING LOGIC ---
+        function showView(viewId) {
+            // Hide all views
+            const views = document.querySelectorAll('.view');
+            views.forEach(v => v.classList.remove('active'));
+            
+            // Show target view
+            document.getElementById(viewId).classList.add('active');
+
+            // Handle Logout Button visibility
+            const logoutBtn = document.getElementById('logoutBtn');
+            if(viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') {
+                logoutBtn.style.display = 'none';
+            } else {
+                logoutBtn.style.display = 'block';
+            }
+
+            // If entering Fan Dash, check if evacuation is active
+            if(viewId === 'view-fan-dash') {
+                applyEvacuationStateToFan();
+            }
+        }
+
+        // --- LOGIN LOGIC ---
+        function loginFan() {
+            const name = document.getElementById('fanName').value;
+            const ticket = document.getElementById('fanTicket').value;
+            
+            if(!name || !ticket) {
+                alert("Please enter both Name and Ticket Number.");
+                return;
+            }
+
+            document.getElementById('displayFanName').innerText = name;
+            document.getElementById('displayFanTicket').innerText = ticket;
+            showView('view-fan-dash');
+        }
+
+        function loginMgmt() {
+            const pin = document.getElementById('adminPin').value;
+            if(pin === "1234") {
+                showView('view-mgmt-dash');
+            } else {
+                alert("Incorrect PIN.");
+            }
+        }
+
+        function logout() {
+            // Clear inputs
+            document.getElementById('fanName').value = '';
+            document.getElementById('fanTicket').value = '';
+            document.getElementById('adminPin').value = '';
+            showView('view-selector');
+        }
+
+        // --- MANAGEMENT LOGIC ---
+        function triggerEvacuation() {
+            const confirmEvac = confirm("WARNING: Are you sure you want to trigger a stadium-wide evacuation?");
+            if(confirmEvac) {
+                globalEvacuationState = true;
+                
+                // Show Global Banner
+                document.getElementById('evac-banner').style.display = 'block';
+                
+                // Add to AI Log
+                const logBox = document.getElementById('aiLogBox');
+                const time = new Date().toLocaleTimeString().split(' ')[0];
+                logBox.innerHTML += `<div class="ai-msg alert" style="color:#ff3333;">[${time}] SYSTEM OVERRIDE: Evacuation Triggered by Command.</div>`;
+                logBox.scrollTop = logBox.scrollHeight;
+
+                alert("Evacuation Protocol Initiated. All Fan Apps have been notified.");
+            }
+        }
+
+        function applyEvacuationStateToFan() {
+            if(globalEvacuationState) {
+                document.getElementById('normal-fan-view').style.display = 'none';
+                document.getElementById('evac-fan-view').style.display = 'block';
+                document.getElementById('evac-banner').style.display = 'block';
+            } else {
+                document.getElementById('normal-fan-view').style.display = 'grid';
+                document.getElementById('evac-fan-view').style.display = 'none';
+                document.getElementById('evac-banner').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
