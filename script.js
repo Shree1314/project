@@ -89,7 +89,7 @@ function startGraph() {
         ctx.stroke(); ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.closePath();
         
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, 'rgba(57, 255, 136, 0.3)'); gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
+        gradient.addColorStop(0, 'rgba(57, 255, 136, 0.25)'); gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
         ctx.fillStyle = gradient; ctx.fill();
     }, 1000); 
 }
