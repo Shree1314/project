@@ -1,31 +1,84 @@
-// --- GLOBAL SYSTEM STATE ---
+// --- 1. INTERACTIVE MOUSE GLOW ---
+const mouseGlow = document.getElementById('mouse-glow');
+document.addEventListener('mousemove', (e) => {
+    mouseGlow.style.left = e.clientX + 'px';
+    mouseGlow.style.top = e.clientY + 'px';
+});
+
+// --- 2. ORGANIC NEURAL NETWORK PATTERN ---
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+const particles = [];
+for(let i=0; i<60; i++) {
+    particles.push({
+        x: Math.random() * width, y: Math.random() * height,
+        r: Math.random() * 1.5 + 0.5,
+        dx: (Math.random() - 0.5) * 0.6, dy: (Math.random() - 0.5) * 0.6,
+        opacity: Math.random() * 0.5 + 0.2
+    });
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, width, height);
+    
+    for(let i=0; i<particles.length; i++) {
+        let p = particles[i];
+        p.x += p.dx; p.y += p.dy;
+        
+        // Bounce smoothly off screen edges to maintain organic flow
+        if(p.x < 0 || p.x > width) p.dx *= -1;
+        if(p.y < 0 || p.y > height) p.dy *= -1;
+        
+        // Draw the glowing cyan nodes
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${p.opacity})`;
+        ctx.fill();
+
+        // Neural network connections (draw lines if nodes are close)
+        for(let j=i+1; j<particles.length; j++) {
+            let p2 = particles[j];
+            let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            
+            if(dist < 120) {
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p2.x, p2.y);
+                // Line opacity fades based on distance
+                ctx.strokeStyle = `rgba(0, 229, 255, ${0.15 - dist/800})`; 
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+            }
+        }
+    }
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+});
+
+// --- 3. SYSTEM LOGIC & ROUTING ---
 let globalEvacuationState = false;
 
-// --- ROUTING LOGIC ---
 function showView(viewId) {
     const views = document.querySelectorAll('.view');
     views.forEach(v => v.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
 
     const logoutBtn = document.getElementById('logoutBtn');
-    if(viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') {
-        logoutBtn.style.display = 'none';
-    } else {
-        logoutBtn.style.display = 'block';
-    }
+    logoutBtn.style.display = (viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') ? 'none' : 'block';
 
     if(viewId === 'view-fan-dash') applyEvacuationStateToFan();
-    
-    if(viewId === 'view-mgmt-dash') {
-        startGraph();
-        startAILogs(); // Start generating live AI data
-    } else {
-        stopGraph();
-        stopAILogs();
-    }
+    if(viewId === 'view-mgmt-dash') { startGraph(); startAILogs(); }
+    else { stopGraph(); stopAILogs(); }
 }
 
-// --- LOGIN LOGIC ---
 function loginFan() {
     const name = document.getElementById('fanName').value;
     const ticket = document.getElementById('fanTicket').value;
@@ -48,17 +101,12 @@ function logout() {
     showView('view-selector');
 }
 
-// --- MANAGEMENT EVACUATION LOGIC ---
+// --- 4. EVACUATION LOGIC ---
 function triggerEvacuation() {
-    const confirmEvac = confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?");
-    if(confirmEvac) {
+    if(confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?")) {
         globalEvacuationState = true;
-        
-        // Show Global Banner
         const banner = document.getElementById('evac-banner');
-        banner.style.display = 'block';
-        banner.classList.add('glitch-text'); // Add CSS glitch animation
-        
+        banner.style.display = 'block'; banner.classList.add('glitch-text');
         addAILog("SYSTEM OVERRIDE: Evacuation Triggered by Command.", "danger");
         alert("Protocol Initiated. All Smart Passes synced to Evacuation Mode.");
     }
@@ -76,107 +124,63 @@ function applyEvacuationStateToFan() {
     }
 }
 
-// --- NEW: DYNAMIC AI LOG GENERATOR ---
+// --- 5. LIVE AI LOG GENERATOR ---
 let aiLogInterval;
 const logPhrases = [
-    "Recalibrating spatial grid mapping...",
-    "Thermal sensors indicate optimal temperatures in Sector B.",
-    "Gate 4 throughput steady at 12 fans/min.",
-    "Anomaly detected in VIP lounge. Re-routing staff.",
-    "Drone swarm 2 returning for battery cycle.",
-    "Concession Stand 3 reports low beverage inventory.",
-    "Predictive model shows 4% increase in exiting traffic next over.",
-    "Network handshake secure with Local Metro Transit API."
+    "Recalibrating spatial grid mapping...", "Thermal sensors indicate optimal temps in Sector B.",
+    "Gate 4 throughput steady at 12 fans/min.", "Anomaly detected in VIP lounge. Re-routing staff.",
+    "Drone swarm 2 returning for battery cycle.", "Predictive model shows 4% traffic increase next over.",
+    "Network handshake secure with Local Transit API."
 ];
 
 function addAILog(message, type = "normal") {
     const logBox = document.getElementById('aiLogBox');
     if(!logBox) return;
-
-    const now = new Date();
-    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-    
-    let colorClass = "";
-    if (type === "warning") colorClass = "warning";
-    if (type === "danger") colorClass = "danger";
-
-    const logHTML = `<div class="ai-msg ${colorClass}"><span class="time">[${timeString}]</span> ${message}</div>`;
-    
-    logBox.innerHTML += logHTML;
-    
-    // Keep only the last 50 logs to prevent memory issues
-    if (logBox.children.length > 50) {
-        logBox.removeChild(logBox.firstChild);
-    }
-
-    // Auto-scroll to bottom smoothly
+    const timeString = new Date().toLocaleTimeString().split(' ')[0];
+    let colorClass = type === "warning" ? "warning" : (type === "danger" ? "danger" : "");
+    logBox.innerHTML += `<div class="ai-msg ${colorClass}"><span class="time">[${timeString}]</span> ${message}</div>`;
+    if (logBox.children.length > 50) logBox.removeChild(logBox.firstChild);
     logBox.scrollTo({ top: logBox.scrollHeight, behavior: 'smooth' });
 }
 
 function startAILogs() {
-    // Clear existing static logs
     const logBox = document.getElementById('aiLogBox');
     if(logBox) logBox.innerHTML = '';
-    
-    addAILog("System boot sequence initialized.");
-    addAILog("Real-time spatial tracking online.");
-
+    addAILog("System boot sequence initialized."); addAILog("Real-time spatial tracking online.");
     aiLogInterval = setInterval(() => {
-        if(globalEvacuationState) return; // Stop random logs during emergency
-        
-        // Randomly pick a phrase
-        const randomPhrase = logPhrases[Math.floor(Math.random() * logPhrases.length)];
-        
-        // 10% chance to be a warning
-        const isWarning = Math.random() > 0.9;
-        addAILog(randomPhrase, isWarning ? "warning" : "normal");
-
-    }, 4000 + Math.random() * 4000); // Random interval between 4 to 8 seconds
+        if(globalEvacuationState) return;
+        const phrase = logPhrases[Math.floor(Math.random() * logPhrases.length)];
+        addAILog(phrase, Math.random() > 0.9 ? "warning" : "normal");
+    }, 4000 + Math.random() * 4000);
 }
+function stopAILogs() { if(aiLogInterval) clearInterval(aiLogInterval); }
 
-function stopAILogs() {
-    if(aiLogInterval) clearInterval(aiLogInterval);
-}
-
-// --- SMOOTH LIVE GRAPH ANIMATION ---
+// --- 6. SMOOTH LIVE GRAPH ---
 let graphInterval;
 function startGraph() {
-    const canvas = document.getElementById('ingress-graph');
-    if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    // Start with a smooth baseline
+    const gCanvas = document.getElementById('ingress-graph');
+    if(!gCanvas) return;
+    const gCtx = gCanvas.getContext('2d');
     let data = Array.from({length: 40}, () => 40);
     let currentTarget = 40;
 
     graphInterval = setInterval(() => {
-        // Smooth target seeking algorithm (looks much better than random jumps)
-        if(Math.random() > 0.8) currentTarget = Math.random() * 50 + 10; // Change target occasionally
-        
-        // Smoothly move the last data point toward the target
-        let lastVal = data[data.length - 1];
-        let nextVal = lastVal + (currentTarget - lastVal) * 0.2;
-        
-        data.shift(); 
-        data.push(nextVal); 
+        if(Math.random() > 0.8) currentTarget = Math.random() * 50 + 10; 
+        let nextVal = data[data.length - 1] + (currentTarget - data[data.length - 1]) * 0.2;
+        data.shift(); data.push(nextVal); 
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath(); ctx.strokeStyle = '#39FF88'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
-        
-        const widthStep = canvas.width / (data.length - 1);
+        gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gCtx.beginPath(); gCtx.strokeStyle = '#39FF88'; gCtx.lineWidth = 2; gCtx.lineJoin = 'round';
+        const widthStep = gCanvas.width / (data.length - 1);
         
         for(let i = 0; i < data.length; i++) {
-            const x = i * widthStep; const y = canvas.height - data[i]; 
-            if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            const x = i * widthStep; const y = gCanvas.height - data[i]; 
+            if(i === 0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y);
         }
-        ctx.stroke(); ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.closePath();
-        
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gCtx.stroke(); gCtx.lineTo(gCanvas.width, gCanvas.height); gCtx.lineTo(0, gCanvas.height); gCtx.closePath();
+        const gradient = gCtx.createLinearGradient(0, 0, 0, gCanvas.height);
         gradient.addColorStop(0, 'rgba(57, 255, 136, 0.25)'); gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
-        ctx.fillStyle = gradient; ctx.fill();
-    }, 500); // Update much faster (500ms) for smoother animation
+        gCtx.fillStyle = gradient; gCtx.fill();
+    }, 500); 
 }
-
-function stopGraph() { 
-    if(graphInterval) clearInterval(graphInterval); 
-}
+function stopGraph() { if(graphInterval) clearInterval(graphInterval); }
