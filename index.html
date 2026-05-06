@@ -9,8 +9,135 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <style>
+        /* ==========================================
+           SMART FAN PASS - PREMIUM STADIUM UI
+           60-30-10 Color Palette
+           ========================================== */
+        :root {
+            --bg-dark: #0B1D33;      /* 60% Deep Navy */
+            --panel-blue: #1F3A5F;   /* 30% Slate Blue */
+            --accent: #39FF88;       /* 10% Electric Green */
+            
+            --text-primary: #F5F7FA;
+            --text-muted: #A9B4C2;
+            --warning: #FFB547;
+            --danger: #FF4D4D;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; }
+
+        /* Cinematic Background Glows */
+        .ambient-glow {
+            position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; z-index: -1; pointer-events: none;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--panel-blue) 0%, transparent 70%); }
+        .glow-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(57, 255, 136, 0.1) 0%, transparent 60%); }
+
+        /* NAVBAR */
+        .navbar {
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(11, 29, 51, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-dot { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+        .logo h1 { font-size: 18px; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+
+        /* CONTAINERS & VIEWS */
+        .container { flex: 1; padding: 40px 20px; display: flex; justify-content: center; align-items: center; z-index: 1; }
+        .view { display: none; width: 100%; max-width: 1000px; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .view.active { display: block; }
+
+        /* GLASSMORPHISM CARDS (30% Slate Blue) */
+        .glass-card {
+            background: rgba(31, 58, 95, 0.3); backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px;
+            padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .inner-card {
+            background: rgba(11, 29, 51, 0.4); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px; padding: 20px;
+        }
+
+        /* TYPOGRAPHY UTILS */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+
+        /* FORMS & INPUTS */
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+        .form-group input {
+            width: 100%; padding: 15px; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 15px;
+            background-color: rgba(11, 29, 51, 0.6); color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px rgba(57, 255, 136, 0.15); }
+
+        /* BUTTONS (10% Accent) */
+        .btn {
+            width: 100%; padding: 15px; border-radius: 10px; font-family: 'Poppins', sans-serif;
+            font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.3s ease; border: none;
+        }
+        .btn-primary {
+            background-color: var(--accent); color: var(--bg-dark);
+            box-shadow: 0 4px 15px rgba(57, 255, 136, 0.2);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(57, 255, 136, 0.4); }
+
+        .btn-outline {
+            background-color: transparent; border: 1px solid var(--accent); color: var(--accent);
+        }
+        .btn-outline:hover { background-color: rgba(57, 255, 136, 0.1); transform: translateY(-3px); }
+
+        .btn-text { background: transparent; color: var(--text-muted); padding: 10px; font-size: 12px; }
+        .btn-text:hover { color: var(--text-primary); }
+
+        .logout-btn { background: transparent; border: none; color: var(--text-muted); font-family: 'Inter'; font-weight: 600; cursor: pointer; display: none; transition: 0.2s;}
+        .logout-btn:hover { color: var(--danger); }
+
+        .btn-evac {
+            background: rgba(255, 77, 77, 0.1); border: 1px solid var(--danger); color: var(--danger);
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
+        }
+        .btn-evac:hover { background: var(--danger); color: white; box-shadow: 0 0 30px rgba(255, 77, 77, 0.5); transform: scale(1.02); }
+
+        /* DASHBOARD SPECIFICS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .status-badge.success { background: rgba(57, 255, 136, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+        /* AI LOGS */
+        .ai-log { flex: 1; overflow-y: auto; font-family: 'Inter', monospace; font-size: 12px; color: var(--text-primary); }
+        .ai-msg { margin-bottom: 12px; padding-left: 12px; border-left: 2px solid rgba(255,255,255,0.2); line-height: 1.4; }
+        .ai-msg .time { color: var(--text-muted); font-size: 10px; margin-right: 5px; }
+        .ai-msg.warning { border-left-color: var(--warning); color: var(--warning); }
+
+        /* EVACUATION STYLES */
+        .evac-banner {
+            display: none; background-color: var(--danger); color: white; text-align: center;
+            padding: 15px; font-size: 16px; font-family: 'Poppins', sans-serif; font-weight: 700; letter-spacing: 2px;
+            box-shadow: 0 5px 20px rgba(255, 77, 77, 0.5); z-index: 100;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
 
@@ -160,5 +287,153 @@
         </div>
 
     </div>
+
+    <script>
+        // --- GLOBAL SYSTEM STATE ---
+        let globalEvacuationState = false;
+
+        // --- ROUTING LOGIC ---
+        function showView(viewId) {
+            // Hide all views
+            const views = document.querySelectorAll('.view');
+            views.forEach(v => v.classList.remove('active'));
+            
+            // Show target view
+            document.getElementById(viewId).classList.add('active');
+
+            // Handle Logout Button visibility
+            const logoutBtn = document.getElementById('logoutBtn');
+            if(viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') {
+                logoutBtn.style.display = 'none';
+            } else {
+                logoutBtn.style.display = 'block';
+            }
+
+            // Apply Evac State if entering Fan Portal
+            if(viewId === 'view-fan-dash') {
+                applyEvacuationStateToFan();
+            }
+            
+            // Start Graph if entering Mgmt Portal
+            if(viewId === 'view-mgmt-dash') {
+                startGraph();
+            } else {
+                stopGraph();
+            }
+        }
+
+        // --- LOGIN LOGIC ---
+        function loginFan() {
+            const name = document.getElementById('fanName').value;
+            const ticket = document.getElementById('fanTicket').value;
+            
+            if(!name || !ticket) {
+                alert("Authentication Failed: Please provide valid credentials.");
+                return;
+            }
+
+            document.getElementById('displayFanName').innerText = name;
+            document.getElementById('displayFanTicket').innerText = ticket;
+            showView('view-fan-dash');
+        }
+
+        function loginMgmt() {
+            const pin = document.getElementById('adminPin').value;
+            if(pin === "1234") {
+                showView('view-mgmt-dash');
+            } else {
+                alert("Authentication Failed: Invalid Admin PIN.");
+            }
+        }
+
+        function logout() {
+            document.getElementById('fanName').value = '';
+            document.getElementById('fanTicket').value = '';
+            document.getElementById('adminPin').value = '';
+            showView('view-selector');
+        }
+
+        // --- MANAGEMENT EVACUATION LOGIC ---
+        function triggerEvacuation() {
+            const confirmEvac = confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?");
+            if(confirmEvac) {
+                globalEvacuationState = true;
+                
+                // Show Global Banner
+                document.getElementById('evac-banner').style.display = 'block';
+                
+                // Add to AI Log
+                const logBox = document.getElementById('aiLogBox');
+                const time = new Date().toLocaleTimeString().split(' ')[0];
+                logBox.innerHTML += `<div class="ai-msg warning" style="color:var(--danger); border-color:var(--danger);"><span class="time">[${time}]</span> SYSTEM OVERRIDE: Evacuation Triggered by Command.</div>`;
+                logBox.scrollTop = logBox.scrollHeight;
+
+                alert("Protocol Initiated. All Smart Passes synced to Evacuation Mode.");
+            }
+        }
+
+        function applyEvacuationStateToFan() {
+            if(globalEvacuationState) {
+                document.getElementById('normal-fan-view').style.display = 'none';
+                document.getElementById('evac-fan-view').style.display = 'block';
+                document.getElementById('evac-banner').style.display = 'block';
+            } else {
+                document.getElementById('normal-fan-view').style.display = 'grid';
+                document.getElementById('evac-fan-view').style.display = 'none';
+                document.getElementById('evac-banner').style.display = 'none';
+            }
+        }
+
+        // --- LIVE GRAPH ANIMATION ---
+        let graphInterval;
+        function startGraph() {
+            const canvas = document.getElementById('ingress-graph');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const data = Array.from({length: 40}, () => Math.random() * 40 + 20);
+
+            graphInterval = setInterval(() => {
+                // Shift data to simulate live feed
+                data.shift();
+                data.push(Math.random() * 40 + 20); // Random ingress value between 20-60
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Setup style matching Electric Green accent
+                ctx.beginPath();
+                ctx.strokeStyle = '#39FF88'; 
+                ctx.lineWidth = 2;
+                ctx.lineJoin = 'round';
+
+                const widthStep = canvas.width / (data.length - 1);
+                
+                // Draw Line
+                for(let i = 0; i < data.length; i++) {
+                    const x = i * widthStep;
+                    const y = canvas.height - data[i]; // Invert Y
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Draw Gradient Fill underneath
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(0, canvas.height);
+                ctx.closePath();
+                
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, 'rgba(57, 255, 136, 0.3)');
+                gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+            }, 1000); // Updates every 1 second
+        }
+
+        function stopGraph() {
+            if(graphInterval) clearInterval(graphInterval);
+        }
+    </script>
 </body>
 </html>
