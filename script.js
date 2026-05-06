@@ -170,7 +170,7 @@ function startGraph() {
         data.shift(); data.push(nextVal); 
 
         gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
-        gCtx.beginPath(); gCtx.strokeStyle = '#39FF88'; gCtx.lineWidth = 2; gCtx.lineJoin = 'round';
+        gCtx.beginPath(); gCtx.strokeStyle = '#00E5FF'; gCtx.lineWidth = 2; gCtx.lineJoin = 'round';
         const widthStep = gCanvas.width / (data.length - 1);
         
         for(let i = 0; i < data.length; i++) {
@@ -179,7 +179,7 @@ function startGraph() {
         }
         gCtx.stroke(); gCtx.lineTo(gCanvas.width, gCanvas.height); gCtx.lineTo(0, gCanvas.height); gCtx.closePath();
         const gradient = gCtx.createLinearGradient(0, 0, 0, gCanvas.height);
-        gradient.addColorStop(0, 'rgba(57, 255, 136, 0.25)'); gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
+        gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
         gCtx.fillStyle = gradient; gCtx.fill();
     }, 500); 
 }
