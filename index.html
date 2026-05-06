@@ -86,18 +86,36 @@
         </div>
 
         <div id="view-fan-dash" class="view">
-            <div class="glass-card text-center">
+            <div class="glass-card text-center hover-lift" style="max-width: 500px; margin: 0 auto;">
                 <h2 style="margin-bottom: 20px;">Network Access Granted</h2>
-                <p class="text-muted">Welcome to the stadium network, <span id="displayFanName" style="color: var(--accent);"></span>.</p>
+                <p class="text-muted" style="margin-bottom: 20px;">Welcome to the stadium network, <span id="displayFanName" style="color: var(--accent);"></span>.</p>
+                <button class="btn btn-outline" style="width: 100%;" onclick="showView('view-selector')">Disconnect</button>
             </div>
         </div>
         <div id="view-mgmt-dash" class="view">
-            <div class="glass-card text-center">
+            <div class="glass-card text-center hover-lift" style="max-width: 500px; margin: 0 auto;">
                 <h2 style="margin-bottom: 20px;">Command Center Online</h2>
-                <p class="text-muted">Routing matrix active.</p>
+                <p class="text-muted" style="margin-bottom: 20px;">Routing matrix and security protocols active.</p>
+                <button class="btn btn-outline" style="width: 100%;" onclick="showView('view-selector')">Disconnect</button>
             </div>
         </div>
 
     </div>
+
+    <footer class="cyber-footer">
+        <div class="footer-content">
+            <div class="support-info">
+                <span>✉ support@smartfanpass.com</span>
+                <span class="divider">|</span>
+                <span>✆ +91 1800-555-0199</span>
+                <span class="divider">|</span>
+                <a href="#" class="help-link">Help Center & FAQ</a>
+            </div>
+            <div class="sys-status">
+                System Status: <span class="status-indicator"></span> Optimal
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
