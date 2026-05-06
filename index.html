@@ -3,119 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Stadium Portal</title>
+    <title>Smart Fan Pass | Command Center</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
 
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
     <div id="evac-banner" class="evac-banner">
-        ⚠ EMERGENCY EVACUATION: PLEASE PROCEED TO THE NEAREST EXIT IMMEDIATELY ⚠
+        ⚠ CRITICAL ALERT: STADIUM EVACUATION INITIATED. PROCEED TO NEAREST EXIT. ⚠
     </div>
 
-    <div class="navbar">
-        <h1>STADIUM<span style="color: var(--accent-10);">SYNC</span></h1>
-        <button id="logoutBtn" class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-dot"></div>
+            <h1>SMART FAN PASS</h1>
+        </div>
+        <button id="logoutBtn" class="logout-btn" onclick="logout()">Disconnect</button>
+    </nav>
 
     <div class="container">
         
         <div id="view-selector" class="view active">
-            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
-                <h2 style="margin-bottom: 30px; font-size: 22px;">Welcome to the Stadium</h2>
-                <button class="btn" onclick="showView('view-fan-login')">Fan / Customer Portal</button>
-                <button class="btn btn-secondary" onclick="showView('view-mgmt-login')">Management Command</button>
+            <div class="glass-card text-center" style="max-width: 500px; margin: 0 auto;">
+                <h2 style="margin-bottom: 10px;">Select Portal</h2>
+                <p class="text-muted" style="margin-bottom: 30px;">Authenticate to access the stadium network.</p>
+                <button class="btn btn-primary" style="margin-bottom: 15px;" onclick="showView('view-fan-login')">Fan / Customer Access</button>
+                <button class="btn btn-outline" onclick="showView('view-mgmt-login')">Management Command</button>
             </div>
         </div>
 
         <div id="view-fan-login" class="view">
-            <div class="card" style="max-width: 400px; margin: 0 auto;">
-                <h2 class="dash-header">Fan Portal Login</h2>
+            <div class="glass-card" style="max-width: 400px; margin: 0 auto;">
+                <h2>Fan Portal</h2>
+                <p class="text-muted" style="margin-bottom: 25px;">Enter your ticket details to sync.</p>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="fanName" placeholder="e.g. John Doe">
+                    <input type="text" id="fanName" placeholder="e.g. Virat Kohli">
                 </div>
                 <div class="form-group">
                     <label>Ticket Number</label>
                     <input type="text" id="fanTicket" placeholder="e.g. TKT-8493">
                 </div>
-                <button class="btn" onclick="loginFan()">Access Smart Pass</button>
-                <button class="btn btn-secondary" style="padding: 10px; font-size: 12px;" onclick="showView('view-selector')">Back</button>
+                <button class="btn btn-primary" style="margin-bottom: 15px;" onclick="loginFan()">Sync Ticket</button>
+                <button class="btn btn-text" onclick="showView('view-selector')">← Back to selection</button>
             </div>
         </div>
 
         <div id="view-mgmt-login" class="view">
-            <div class="card" style="max-width: 400px; margin: 0 auto;">
-                <h2 class="dash-header">Command Center Login</h2>
+            <div class="glass-card" style="max-width: 400px; margin: 0 auto;">
+                <h2>Command Center</h2>
+                <p class="text-muted" style="margin-bottom: 25px;">Secure admin access required.</p>
                 <div class="form-group">
                     <label>Admin PIN (Hint: 1234)</label>
                     <input type="password" id="adminPin" placeholder="****">
                 </div>
-                <button class="btn" onclick="loginMgmt()">Authenticate</button>
-                <button class="btn btn-secondary" style="padding: 10px; font-size: 12px;" onclick="showView('view-selector')">Back</button>
+                <button class="btn btn-primary" style="margin-bottom: 15px;" onclick="loginMgmt()">Authenticate</button>
+                <button class="btn btn-text" onclick="showView('view-selector')">← Back to selection</button>
             </div>
         </div>
 
         <div id="view-fan-dash" class="view">
-            <div class="card">
-                <h2 class="dash-header">Hello, <span id="displayFanName" style="color: var(--accent-10);">Fan</span></h2>
+            <div class="glass-card">
+                <div class="dash-header">
+                    <div>
+                        <h2>Welcome, <span id="displayFanName" style="color: var(--accent);">Fan</span></h2>
+                        <p class="text-muted">Ticket: <span id="displayFanTicket" style="color: var(--text-primary);">TKT-000</span></p>
+                    </div>
+                    <div class="status-badge success">Live Sync Active</div>
+                </div>
                 
                 <div id="normal-fan-view" class="grid-2">
-                    <div>
-                        <div class="stat-box" style="margin-bottom: 20px;">
-                            <h3>Your Ticket Number</h3>
-                            <div class="value" id="displayFanTicket" style="font-size: 18px; color: var(--text-light);">TKT-000</div>
-                        </div>
-                        <div class="stat-box">
-                            <h3>Assigned Entry</h3>
-                            <div class="value">GATE 3</div>
-                            <p style="font-size: 12px; color: #10b981; margin-top: 5px;">Status: Clear</p>
-                        </div>
+                    <div class="inner-card text-center" style="border: 1px solid var(--accent); box-shadow: 0 0 20px rgba(57, 255, 136, 0.1);">
+                        <p class="text-muted" style="font-weight: 600; text-transform: uppercase;">Optimal Entry Route</p>
+                        <h1 style="font-size: 48px; color: var(--accent); margin: 10px 0;">GATE 3</h1>
+                        <p style="color: var(--accent); font-weight: 500;">Wait time: < 2 mins</p>
                     </div>
-                    <div style="background: var(--bg-60); padding: 20px; border-radius: 8px;">
-                        <h3 style="color: var(--accent-10); margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">AI Virtual Assistant</h3>
-                        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">
-                            Welcome to the match! Gate 3 is currently experiencing low traffic. Expected security wait time is 2 minutes. Enjoy the game!
+
+                    <div class="inner-card">
+                        <h3 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span class="logo-dot"></span> AI Assistant
+                        </h3>
+                        <p class="text-muted" style="margin-bottom: 20px; line-height: 1.6;">
+                            Your path is clear. Avoid Gate 2 as we are detecting a sudden surge in traffic. Food and beverage lines near Gate 3 are currently empty.
                         </p>
-                        <button class="btn btn-secondary" onclick="alert('Support staff dispatched to your location.')">Request Assistance</button>
+                        <button class="btn btn-outline" style="padding: 10px;" onclick="alert('Support staff dispatched to your location.')">Request Assistance</button>
                     </div>
                 </div>
 
-                <div id="evac-fan-view" style="display: none; text-align: center; padding: 30px;">
-                    <h1 style="color: #ff3333; font-size: 40px; margin-bottom: 20px;">⚠ EVACUATE ⚠</h1>
-                    <p style="font-size: 18px;">Please leave your belongings and walk calmly to the nearest open exit. Follow staff instructions.</p>
+                <div id="evac-fan-view" class="inner-card" style="display: none; text-align: center; border-color: var(--danger); background: rgba(255, 77, 77, 0.1);">
+                    <h1 style="color: var(--danger); font-size: 40px; margin-bottom: 15px;">⚠ EVACUATE NOW ⚠</h1>
+                    <p style="font-size: 18px; color: var(--text-primary);">Please leave your belongings and walk calmly to the nearest open exit. Follow staff instructions.</p>
                 </div>
             </div>
         </div>
 
         <div id="view-mgmt-dash" class="view">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;" class="dash-header">
-                    <h2>Live Crowd Command</h2>
-                    <span style="background: var(--bg-60); padding: 5px 10px; border-radius: 4px; font-size: 12px; border: 1px solid #10b981; color: #10b981;">SYSTEM ONLINE</span>
+            <div class="glass-card">
+                <div class="dash-header">
+                    <div>
+                        <h2>Stadium Analytics Command</h2>
+                        <p class="text-muted">Live Crowd Topology & AI Routing</p>
+                    </div>
+                    <div class="status-badge success">Network Secured</div>
                 </div>
                 
                 <div class="grid-2">
                     <div>
-                        <h3 style="color: var(--text-muted); font-size: 12px; text-transform: uppercase; margin-bottom: 10px;">Turnstile Traffic</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <div class="stat-box"><h3>Gate 1</h3><div class="value" style="color: #10b981;">45</div></div>
-                            <div class="stat-box"><h3>Gate 2</h3><div class="value" style="color: var(--accent-10);">128</div></div>
-                            <div class="stat-box"><h3>Gate 3</h3><div class="value" style="color: #10b981;">12</div></div>
-                            <div class="stat-box"><h3>Gate 4</h3><div class="value" style="color: #10b981;">67</div></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div class="inner-card text-center">
+                                <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Gate 1 (Normal)</p>
+                                <h3 style="color: var(--text-primary); font-size: 28px;">45</h3>
+                            </div>
+                            <div class="inner-card text-center" style="border-color: var(--warning);">
+                                <p style="color: var(--warning); font-size: 11px; text-transform: uppercase;">Gate 2 (Surge)</p>
+                                <h3 style="color: var(--warning); font-size: 28px;">128</h3>
+                            </div>
+                            <div class="inner-card text-center">
+                                <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Gate 3 (Optimal)</p>
+                                <h3 style="color: var(--accent); font-size: 28px;">12</h3>
+                            </div>
+                            <div class="inner-card text-center">
+                                <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Gate 4 (Normal)</p>
+                                <h3 style="color: var(--text-primary); font-size: 28px;">67</h3>
+                            </div>
+                        </div>
+
+                        <div class="inner-card">
+                            <p class="text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 10px;">Live Ingress Rate</p>
+                            <canvas id="ingress-graph" width="400" height="80" style="width: 100%; height: 80px;"></canvas>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 style="color: var(--text-muted); font-size: 12px; text-transform: uppercase; margin-bottom: 10px;">AI Predictive Logs</h3>
-                        <div class="ai-log" id="aiLogBox">
-                            <div class="ai-msg">[18:00] System boot successful.</div>
-                            <div class="ai-msg">[18:05] Routine ingress tracking started.</div>
-                            <div class="ai-msg alert">[18:12] PREDICTION: Gate 2 will congest in 10 mins. Redirecting Fan App traffic to Gate 3.</div>
-                            <div class="ai-msg">[18:15] VIP lane utilization at 14%.</div>
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="inner-card" style="flex: 1; display: flex; flex-direction: column;">
+                            <p class="text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 10px;">Predictive AI Logs</p>
+                            <div class="ai-log" id="aiLogBox">
+                                <div class="ai-msg"><span class="time">[18:00]</span> System boot sequence initialized.</div>
+                                <div class="ai-msg"><span class="time">[18:05]</span> Real-time spatial tracking online.</div>
+                                <div class="ai-msg warning"><span class="time">[18:12]</span> PREDICTION: Gate 2 congestion likely in 8 mins.</div>
+                                <div class="ai-msg"><span class="time">[18:15]</span> Rerouting 14% of incoming traffic to Gate 3.</div>
+                            </div>
                         </div>
                         
-                        <button class="btn evac-btn" style="margin-top: 15px;" onclick="triggerEvacuation()">⚠ TRIGGER EVACUATION PROTOCOL</button>
+                        <button class="btn btn-evac" onclick="triggerEvacuation()">⚠ INITIATE EMERGENCY EVACUATION</button>
                     </div>
                 </div>
             </div>
