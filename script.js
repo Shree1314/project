@@ -3,14 +3,10 @@ let globalEvacuationState = false;
 
 // --- ROUTING LOGIC ---
 function showView(viewId) {
-    // Hide all views
     const views = document.querySelectorAll('.view');
     views.forEach(v => v.classList.remove('active'));
-    
-    // Show target view
     document.getElementById(viewId).classList.add('active');
 
-    // Handle Logout Button visibility
     const logoutBtn = document.getElementById('logoutBtn');
     if(viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') {
         logoutBtn.style.display = 'none';
@@ -18,22 +14,16 @@ function showView(viewId) {
         logoutBtn.style.display = 'block';
     }
 
-    // If entering Fan Dash, check if evacuation is active
-    if(viewId === 'view-fan-dash') {
-        applyEvacuationStateToFan();
-    }
+    if(viewId === 'view-fan-dash') applyEvacuationStateToFan();
+    if(viewId === 'view-mgmt-dash') startGraph();
+    else stopGraph();
 }
 
 // --- LOGIN LOGIC ---
 function loginFan() {
     const name = document.getElementById('fanName').value;
     const ticket = document.getElementById('fanTicket').value;
-    
-    if(!name || !ticket) {
-        alert("Please enter both Name and Ticket Number.");
-        return;
-    }
-
+    if(!name || !ticket) { alert("Authentication Failed: Please provide valid credentials."); return; }
     document.getElementById('displayFanName').innerText = name;
     document.getElementById('displayFanTicket').innerText = ticket;
     showView('view-fan-dash');
@@ -41,37 +31,28 @@ function loginFan() {
 
 function loginMgmt() {
     const pin = document.getElementById('adminPin').value;
-    if(pin === "1234") {
-        showView('view-mgmt-dash');
-    } else {
-        alert("Incorrect PIN.");
-    }
+    if(pin === "1234") showView('view-mgmt-dash');
+    else alert("Authentication Failed: Invalid Admin PIN.");
 }
 
 function logout() {
-    // Clear inputs
     document.getElementById('fanName').value = '';
     document.getElementById('fanTicket').value = '';
     document.getElementById('adminPin').value = '';
     showView('view-selector');
 }
 
-// --- MANAGEMENT LOGIC ---
+// --- MANAGEMENT EVACUATION LOGIC ---
 function triggerEvacuation() {
-    const confirmEvac = confirm("WARNING: Are you sure you want to trigger a stadium-wide evacuation?");
+    const confirmEvac = confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?");
     if(confirmEvac) {
         globalEvacuationState = true;
-        
-        // Show Global Banner
         document.getElementById('evac-banner').style.display = 'block';
-        
-        // Add to AI Log
         const logBox = document.getElementById('aiLogBox');
         const time = new Date().toLocaleTimeString().split(' ')[0];
-        logBox.innerHTML += `<div class="ai-msg alert" style="color:#ff3333;">[${time}] SYSTEM OVERRIDE: Evacuation Triggered by Command.</div>`;
+        logBox.innerHTML += `<div class="ai-msg warning" style="color:var(--danger); border-color:var(--danger);"><span class="time">[${time}]</span> SYSTEM OVERRIDE: Evacuation Triggered by Command.</div>`;
         logBox.scrollTop = logBox.scrollHeight;
-
-        alert("Evacuation Protocol Initiated. All Fan Apps have been notified.");
+        alert("Protocol Initiated. All Smart Passes synced to Evacuation Mode.");
     }
 }
 
@@ -86,3 +67,31 @@ function applyEvacuationStateToFan() {
         document.getElementById('evac-banner').style.display = 'none';
     }
 }
+
+// --- LIVE GRAPH ANIMATION ---
+let graphInterval;
+function startGraph() {
+    const canvas = document.getElementById('ingress-graph');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const data = Array.from({length: 40}, () => Math.random() * 40 + 20);
+
+    graphInterval = setInterval(() => {
+        data.shift(); data.push(Math.random() * 40 + 20); 
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath(); ctx.strokeStyle = '#39FF88'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+        const widthStep = canvas.width / (data.length - 1);
+        
+        for(let i = 0; i < data.length; i++) {
+            const x = i * widthStep; const y = canvas.height - data[i]; 
+            if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke(); ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.closePath();
+        
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, 'rgba(57, 255, 136, 0.3)'); gradient.addColorStop(1, 'rgba(57, 255, 136, 0.0)');
+        ctx.fillStyle = gradient; ctx.fill();
+    }, 1000); 
+}
+
+function stopGraph() { if(graphInterval) clearInterval(graphInterval); }
