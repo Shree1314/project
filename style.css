@@ -6,11 +6,8 @@
     --bg-blue: #071324;      /* Deep Blue */
     --accent: #39FF88;       /* Bright Neon Green */
     --accent-cyan: #00E5FF;  /* Electric Blue/Cyan */
-    --accent-dark-cyan: rgba(0, 229, 255, 0.3);
-    
     --text-primary: #F5F7FA;
     --text-muted: #8B9BB4;
-    --glass-border: rgba(0, 229, 255, 0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,13 +25,11 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 /* ==========================================
    ATMOSPHERIC BACKGROUND LAYERS
    ========================================== */
-/* 1. Deep Radial Gradient */
 .bg-gradient {
     position: fixed; inset: 0; z-index: -6; pointer-events: none;
     background: radial-gradient(circle at center, var(--bg-blue) 0%, var(--bg-deep) 85%);
 }
 
-/* 2. Cybernetic Top Corner Wireframes */
 .wireframe {
     position: fixed; width: 350px; height: 350px; z-index: -4; pointer-events: none;
     background-image: 
@@ -45,7 +40,6 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .wireframe.tl { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
 .wireframe.tr { top: 0; right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
 
-/* 3. Abstract Geometry (Spinning HUD elements in corners) */
 .abstract-geo {
     position: fixed; border-radius: 50%; border: 1px dashed rgba(0, 229, 255, 0.3);
     pointer-events: none; z-index: -3; animation: spinGeo 40s linear infinite;
@@ -54,7 +48,6 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .top-right-geo { top: -80px; right: -80px; width: 300px; height: 300px; animation-direction: reverse; border: 1px dotted rgba(57, 255, 136, 0.2); }
 @keyframes spinGeo { 100% { transform: rotate(360deg); } }
 
-/* 4. Complex Data Streams */
 .data-stream {
     position: fixed; top: -300px; height: 250px;
     background: linear-gradient(to bottom, transparent, var(--accent-cyan), #fff);
@@ -63,7 +56,6 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 }
 @keyframes dataFall { to { transform: translateY(130vh); } }
 
-/* 5. Glowing Orbs */
 .ambient-glow {
     position: fixed; border-radius: 50%; filter: blur(140px); opacity: 0.25; z-index: -5; pointer-events: none;
     animation: floatBlob 20s ease-in-out infinite alternate;
@@ -72,10 +64,8 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .glow-2 { bottom: 10%; right: 20%; width: 50vw; height: 50vw; background: rgba(57, 255, 136, 0.2); animation-delay: -5s; }
 @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, -40px); } }
 
-/* Neural Network Canvas */
 #particle-canvas { position: fixed; inset: 0; z-index: -3; pointer-events: none; }
 
-/* Interactive Mouse Glow */
 #mouse-glow {
     position: fixed; width: 600px; height: 600px; border-radius: 50%;
     background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 60%);
@@ -85,9 +75,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 /* ==========================================
    MODAL & UI ELEMENTS
    ========================================== */
-.navbar {
-    padding: 25px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 10;
-}
+.navbar { padding: 25px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
 .logo h1 { font-size: 20px; letter-spacing: 4px; text-transform: uppercase; margin: 0; font-weight: 700; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
 .nav-actions { display: flex; align-items: center; gap: 20px; }
 
@@ -97,7 +85,6 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
     animation: pulse-green 2s infinite;
 }
 
-/* LIVE 3D SIM Button */
 .btn-sim {
     text-decoration: none; display: flex; align-items: center;
     background: rgba(57, 255, 136, 0.05); border: 1px solid rgba(57, 255, 136, 0.4); color: var(--accent);
@@ -106,14 +93,11 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 }
 .btn-sim:hover { background: rgba(57, 255, 136, 0.15); box-shadow: 0 0 25px rgba(57, 255, 136, 0.4); border-color: var(--accent); }
 
-/* Central Glass Modal (With Circuit Board Pattern) */
 .glass-card {
     background-color: rgba(7, 14, 26, 0.6); 
-    /* Circuit Board SVG Base64 */
     background-image: url('data:image/svg+xml;utf8,<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 h30 v20 h20 m10 10 v40 h-30 m50 -60 h30 v30" stroke="rgba(0, 229, 255, 0.05)" fill="none" stroke-width="1.5"/><circle cx="60" cy="30" r="2" fill="rgba(0, 229, 255, 0.1)"/><circle cx="40" cy="80" r="2" fill="rgba(0, 229, 255, 0.1)"/></svg>');
     backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(0, 229, 255, 0.2); 
-    border-top: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(0, 229, 255, 0.2); border-top: 1px solid rgba(255,255,255,0.15);
     border-radius: 20px; padding: 50px 40px; 
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 229, 255, 0.05);
     transition: transform 0.4s ease;
@@ -125,52 +109,55 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .view { display: none; width: 100%; max-width: 1050px; animation: smoothReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1); margin: 0 auto;}
 .view.active { display: block; }
 
-/* Typography */
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }
 
-/* Forms */
 .form-group { margin-bottom: 25px; text-align: left; }
 .form-group label { display: block; margin-bottom: 10px; color: var(--accent-cyan); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
 .form-group input {
     width: 100%; padding: 16px 20px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px;
-    background-color: rgba(0, 0, 0, 0.5); color: #fff;
-    border: 1px solid rgba(0, 229, 255, 0.3); transition: all 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.5); color: #fff; border: 1px solid rgba(0, 229, 255, 0.3); transition: all 0.3s ease;
 }
 .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 20px rgba(57, 255, 136, 0.2); }
 
-/* Buttons */
 .btn {
     width: 100%; padding: 18px; border-radius: 8px; font-family: 'Poppins', sans-serif;
     font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
     cursor: pointer; transition: all 0.3s ease; border: none;
 }
 
-/* Green Neon Button */
 .btn-primary.glow-btn { 
     background-color: var(--accent); color: var(--bg-deep); 
     box-shadow: 0 0 20px rgba(57, 255, 136, 0.4), 0 0 40px rgba(57, 255, 136, 0.2);
 }
-.btn-primary.glow-btn:hover { 
-    transform: translateY(-2px); 
-    box-shadow: 0 0 30px rgba(57, 255, 136, 0.6), 0 0 60px rgba(57, 255, 136, 0.4); 
-}
+.btn-primary.glow-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(57, 255, 136, 0.6), 0 0 60px rgba(57, 255, 136, 0.4); }
 
-/* Outlined Button */
-.btn-outline { 
-    background-color: transparent; border: 1px solid rgba(0, 229, 255, 0.5); 
-    color: #fff; margin-top: 15px; 
-}
-.btn-outline:hover { 
-    border-color: var(--accent-cyan); background: rgba(0, 229, 255, 0.1); 
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
-}
+.btn-outline { background-color: transparent; border: 1px solid rgba(0, 229, 255, 0.5); color: #fff; margin-top: 15px; }
+.btn-outline:hover { border-color: var(--accent-cyan); background: rgba(0, 229, 255, 0.1); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
 
 .btn-text { background: transparent; color: var(--text-muted); padding: 12px; font-size: 12px; font-weight: 500;}
 .btn-text:hover { color: var(--text-primary); }
 
 .logout-btn { background: transparent; border: none; color: var(--text-muted); font-family: 'Inter'; font-weight: 500; font-size: 13px; cursor: pointer; display: none; transition: 0.2s;}
-.logout-btn:hover { color: var(--danger); text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);}
+.logout-btn:hover { color: var(--danger); }
+
+/* ==========================================
+   SUPPORT FOOTER
+   ========================================== */
+.cyber-footer {
+    width: 100%; padding: 15px 40px; background: rgba(4, 10, 21, 0.6); 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 229, 255, 0.15); z-index: 10;
+    font-size: 12px; font-weight: 400; color: var(--text-muted);
+}
+.footer-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+.support-info { display: flex; align-items: center; gap: 15px; }
+.divider { color: rgba(0, 229, 255, 0.3); }
+.help-link { color: var(--accent-cyan); text-decoration: none; transition: 0.3s; font-weight: 500; }
+.help-link:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+
+.sys-status { display: flex; align-items: center; gap: 8px; font-family: monospace; font-size: 11px; }
+.status-indicator { display: inline-block; width: 6px; height: 6px; background-color: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
 
 @keyframes smoothReveal { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(57, 255, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0); } }
