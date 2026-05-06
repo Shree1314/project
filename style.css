@@ -3,61 +3,51 @@
    60-30-10 Color Palette + Layered Depth
    ========================================== */
 :root {
-    --bg-dark: #071324;      /* Deepest Navy */
-    --panel-blue: #142842;   /* Slate Blue / Glass Tint */
+    --bg-dark: #040A15;      /* Deepest Navy */
+    --panel-blue: #10213B;   /* Slate Blue / Glass Tint */
     --accent: #39FF88;       /* Electric Green */
+    --accent-cyan: #00E5FF;  /* Secondary glow */
     
     --text-primary: #F5F7FA;
     --text-muted: #8B9BB4;
     --warning: #FFB547;
     --danger: #FF4D4D;
-    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.08);
     --rim-light: rgba(255, 255, 255, 0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* --- NEW: Custom Text Selection --- */
+::selection { background: rgba(57, 255, 136, 0.3); color: #fff; }
+
+/* --- NEW: Custom Webkit Scrollbar --- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(7, 19, 36, 0.8); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(57, 255, 136, 0.3); border-radius: 10px; transition: 0.3s; }
+::-webkit-scrollbar-thumb:hover { background: rgba(57, 255, 136, 0.8); }
+
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    position: relative;
+    background-color: var(--bg-dark); color: var(--text-primary);
+    font-family: 'Inter', sans-serif; min-height: 100vh;
+    display: flex; flex-direction: column; overflow-x: hidden; position: relative;
 }
 
 h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-spacing: 0.5px; }
 
-/* ==========================================
-   BACKGROUND LAYERS (Depth & Cinematic feel)
-   ========================================== */
-
-/* Layer 1: Subtle Grid Pattern */
+/* BACKGROUND LAYERS */
 .bg-grid {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -3;
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none;
 }
 
-/* Layer 2: Animated Mesh Gradients (Ambient Glow) */
 .ambient-glow {
-    position: fixed; border-radius: 50%; filter: blur(120px); 
-    opacity: 0.35; z-index: -2; pointer-events: none;
+    position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.35; z-index: -2; pointer-events: none;
     animation: floatBlob 20s ease-in-out infinite alternate;
 }
-.glow-1 { 
-    top: -10%; left: -10%; width: 60vw; height: 60vw; 
-    background: radial-gradient(circle, var(--panel-blue) 0%, transparent 60%); 
-}
-.glow-2 { 
-    bottom: -20%; right: -10%; width: 70vw; height: 70vw; 
-    background: radial-gradient(circle, rgba(57, 255, 136, 0.12) 0%, transparent 60%); 
-    animation-delay: -5s;
-}
+.glow-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--panel-blue) 0%, transparent 60%); }
+.glow-2 { bottom: -20%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(57, 255, 136, 0.12) 0%, transparent 60%); animation-delay: -5s; }
 
 @keyframes floatBlob {
     0% { transform: translate(0px, 0px) scale(1); }
@@ -66,9 +56,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
     100% { transform: translate(0px, 0px) scale(1); }
 }
 
-/* ==========================================
-   GLASSMORPHISM (Refined & Minimal)
-   ========================================== */
+/* GLASSMORPHISM */
 .navbar {
     padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
     background: rgba(7, 19, 36, 0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
@@ -76,46 +64,34 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 }
 
 .glass-card {
-    background: rgba(20, 40, 66, 0.15); /* Low Opacity */
-    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--glass-border);
-    border-top: 1px solid var(--rim-light); /* Subtly brighter top edge for rim lighting */
+    background: rgba(20, 40, 66, 0.15); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border); border-top: 1px solid var(--rim-light);
     border-radius: 20px; padding: 40px; 
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
 }
 
 .inner-card {
-    background: rgba(7, 19, 36, 0.3); 
-    border: 1px solid var(--glass-border); border-top: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px; padding: 25px;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(7, 19, 36, 0.3); border: 1px solid var(--glass-border); border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px; padding: 25px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hover Lift Animations */
 .hover-lift:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(57, 255, 136, 0.05);
+    transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(57, 255, 136, 0.05);
     border-color: rgba(255,255,255,0.15);
 }
 
-/* Moving Gradient Border */
-.animated-border {
-    position: relative; z-index: 1; overflow: hidden;
-}
+.animated-border { position: relative; z-index: 1; overflow: hidden; }
 .animated-border::before {
     content: ""; position: absolute; inset: 0; border-radius: 14px; padding: 1px;
     background: linear-gradient(45deg, transparent, rgba(57, 255, 136, 0.6), transparent);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    background-size: 200% 200%;
+    -webkit-mask-composite: xor; mask-composite: exclude; background-size: 200% 200%;
     animation: moveGradient 3s linear infinite; pointer-events: none;
 }
 @keyframes moveGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-/* ==========================================
-   UI ELEMENTS
-   ========================================== */
+/* UI ELEMENTS */
 .logo { display: flex; align-items: center; gap: 12px; }
 .logo h1 { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; margin: 0; font-weight: 700;}
 .nav-actions { display: flex; align-items: center; gap: 20px; }
@@ -138,7 +114,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .view { display: none; width: 100%; max-width: 1050px; animation: smoothReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .view.active { display: block; }
 
-/* Forms & Buttons */
+/* FORMS & BUTTONS */
 .form-group { margin-bottom: 25px; text-align: left; }
 .form-group label { display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; }
 .form-group input {
@@ -146,7 +122,10 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
     background-color: rgba(7, 19, 36, 0.5); color: var(--text-primary);
     border: 1px solid var(--glass-border); transition: all 0.3s ease;
 }
-.form-group input:focus { outline: none; border-color: rgba(57, 255, 136, 0.5); background-color: rgba(7, 19, 36, 0.8); box-shadow: 0 0 20px rgba(57, 255, 136, 0.1); }
+.form-group input:focus { 
+    outline: none; border-color: rgba(57, 255, 136, 0.5); background-color: rgba(7, 19, 36, 0.8); 
+    box-shadow: 0 0 20px rgba(57, 255, 136, 0.1), inset 0 2px 10px rgba(0,0,0,0.5); 
+}
 
 .btn {
     width: 100%; padding: 16px; border-radius: 10px; font-family: 'Poppins', sans-serif;
@@ -155,6 +134,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 }
 .btn-primary { background-color: var(--accent); color: var(--bg-dark); box-shadow: 0 4px 20px rgba(57, 255, 136, 0.2); }
 .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(57, 255, 136, 0.4); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 2px 10px rgba(57, 255, 136, 0.2); }
 
 .btn-outline { background-color: transparent; border: 1px solid var(--glass-border); color: var(--text-primary); }
 .btn-outline:hover { border-color: var(--text-primary); transform: translateY(-2px); }
@@ -163,7 +143,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .btn-text:hover { color: var(--text-primary); }
 
 .logout-btn { background: transparent; border: none; color: var(--text-muted); font-family: 'Inter'; font-weight: 500; font-size: 13px; cursor: pointer; display: none; transition: 0.2s;}
-.logout-btn:hover { color: var(--danger); }
+.logout-btn:hover { color: var(--danger); text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);}
 
 .btn-evac {
     background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.3); color: var(--danger);
@@ -171,7 +151,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 }
 .btn-evac:hover { background: rgba(255, 77, 77, 0.15); border-color: var(--danger); color: var(--danger); box-shadow: 0 0 30px rgba(255, 77, 77, 0.3); transform: translateY(-3px); }
 
-/* Dashboard Layouts */
+/* DASHBOARD LAYOUT */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
@@ -179,23 +159,32 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .status-badge { padding: 8px 14px; border-radius: 30px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; backdrop-filter: blur(10px); }
 .status-badge.success { background: rgba(57, 255, 136, 0.05); color: var(--accent); border: 1px solid rgba(57, 255, 136, 0.2); }
 
-/* Typography Helpers */
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }
 
-/* AI Logs */
-.ai-log { flex: 1; overflow-y: auto; font-family: 'Inter', monospace; font-size: 12px; color: var(--text-primary); font-weight: 300;}
-.ai-msg { margin-bottom: 16px; padding-left: 14px; border-left: 2px solid rgba(255,255,255,0.1); line-height: 1.5; opacity: 0.9;}
+/* AI LOGS */
+.ai-log { flex: 1; overflow-y: auto; font-family: 'Inter', monospace; font-size: 12px; color: var(--text-primary); font-weight: 300; height: 200px; padding-right: 10px;}
+.ai-msg { margin-bottom: 16px; padding-left: 14px; border-left: 2px solid rgba(255,255,255,0.1); line-height: 1.5; opacity: 0; animation: fadeInLog 0.5s forwards;}
 .ai-msg .time { color: var(--text-muted); font-size: 10px; margin-right: 8px; font-weight: 500;}
-.ai-msg.warning { border-left-color: var(--warning); color: var(--warning); opacity: 1;}
+.ai-msg.warning { border-left-color: var(--warning); color: var(--warning); }
+.ai-msg.danger { border-left-color: var(--danger); color: var(--danger); font-weight: bold; }
 
-/* Evacuation Alert UI */
+/* EVACUATION UI */
 .evac-banner {
     display: none; background: rgba(255, 77, 77, 0.15); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 77, 77, 0.3);
     color: var(--danger); text-align: center; padding: 18px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 2px;
     box-shadow: 0 5px 30px rgba(255, 77, 77, 0.2); z-index: 100;
 }
 
-/* Animations */
+/* --- NEW: Tech Glitch Animation for Emergency --- */
+.glitch-text { animation: glitch 2s linear infinite; }
+
+/* ANIMATIONS */
 @keyframes smoothReveal { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(57, 255, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0); } }
+@keyframes fadeInLog { from { opacity: 0; transform: translateX(-10px); } to { opacity: 0.9; transform: translateX(0); } }
+@keyframes glitch {
+  2%, 64% { transform: translate(2px, 0) skew(0deg); }
+  4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+  62% { transform: translate(0, 0) skew(5deg); }
+}
