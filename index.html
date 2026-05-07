@@ -3,200 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Fan Pass | Premium Command Center</title>
-    
+    <title>Generative Particle Network</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
 
-    <div class="bg-gradient"></div>
-    <div class="ambient-glow glow-1"></div>
-    <div class="ambient-glow glow-2"></div>
-    <div id="mouse-glow"></div>
+    <canvas id="sim-canvas"></canvas>
 
-    <div class="wireframe tl"></div>
-    <div class="wireframe tr"></div>
-    <div class="abstract-geo top-left-geo"></div>
-    <div class="abstract-geo top-right-geo"></div>
-
-    <div class="data-stream" style="left: 10%; width: 2px; animation-duration: 4s; animation-delay: 1s; opacity: 0.4;"></div>
-    <div class="data-stream" style="left: 25%; width: 1px; animation-duration: 7s; animation-delay: 0s; opacity: 0.2;"></div>
-    <div class="data-stream" style="left: 45%; width: 3px; animation-duration: 5s; animation-delay: 2s; opacity: 0.5;"></div>
-    <div class="data-stream" style="left: 70%; width: 1px; animation-duration: 8s; animation-delay: 0.5s; opacity: 0.3;"></div>
-    <div class="data-stream" style="left: 88%; width: 2px; animation-duration: 6s; animation-delay: 1.5s; opacity: 0.6;"></div>
-
-    <canvas id="particle-canvas"></canvas>
-
-    <div id="evac-banner" class="evac-banner">
-        <span class="live-dot" style="background-color: var(--danger); box-shadow: 0 0 10px var(--danger);"></span>
-        CRITICAL ALERT: STADIUM EVACUATION INITIATED. PROCEED TO NEAREST EXIT.
-    </div>
-
-    <nav class="navbar">
-        <div class="logo">
-            <h1>SMART FAN PASS</h1>
-        </div>
-        <div class="nav-actions">
-            <a href="simulation.html" target="_blank" class="btn-sim">
-                <span class="live-dot"></span> LIVE 3D SIM ⧉
-            </a>
-            <button id="logoutBtn" class="logout-btn" onclick="logout()">Disconnect</button>
-        </div>
-    </nav>
-
-    <div class="container">
+    <div class="control-panel">
+        <h3 style="margin-bottom: 15px; color: #fff; font-size: 16px;">Network Controls</h3>
         
-        <div id="view-selector" class="view active">
-            <div class="glass-card text-center hover-lift" style="max-width: 480px; margin: 0 auto;">
-                <h2 style="margin-bottom: 8px; font-size: 28px;">Select Portal</h2>
-                <p class="text-muted" style="margin-bottom: 35px; font-weight: 300;">Authenticate to access the stadium network.</p>
-                <button class="btn btn-primary glow-btn" onclick="showView('view-fan-login')" style="margin-bottom: 15px;">FAN / CUSTOMER ACCESS</button>
-                <button class="btn btn-outline" onclick="showView('view-mgmt-login')">MANAGEMENT COMMAND</button>
+        <div class="control-grid">
+            <div class="input-group">
+                <label for="particle-count">Particle Count (<span id="count-val">100</span>)</label>
+                <input type="range" id="particle-count" min="20" max="300" value="100">
             </div>
-        </div>
 
-        <div id="view-fan-login" class="view">
-            <div class="glass-card hover-lift" style="max-width: 420px; margin: 0 auto;">
-                <h2 style="font-size: 24px; text-align: center; margin-bottom: 30px;">Fan Portal</h2>
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="fanName" placeholder="e.g. Virat Kohli">
-                </div>
-                <div class="form-group">
-                    <label>Ticket Number</label>
-                    <input type="text" id="fanTicket" placeholder="e.g. TKT-8493">
-                </div>
-                <button class="btn btn-primary glow-btn" style="margin-bottom: 15px;" onclick="loginFan()">AUTHENTICATE</button>
-                <button class="btn btn-text" style="width: 100%;" onclick="showView('view-selector')">← Back</button>
+            <div class="input-group">
+                <label for="speed-mult">Speed Multiplier (<span id="speed-val">1.0</span>x)</label>
+                <input type="range" id="speed-mult" min="0.1" max="5.0" step="0.1" value="1.0">
             </div>
-        </div>
 
-        <div id="view-mgmt-login" class="view">
-            <div class="glass-card hover-lift" style="max-width: 420px; margin: 0 auto;">
-                <h2 style="font-size: 24px; text-align: center; margin-bottom: 30px;">Command Center</h2>
-                <div class="form-group">
-                    <label>Admin PIN (Hint: 1234)</label>
-                    <input type="password" id="adminPin" placeholder="****">
-                </div>
-                <button class="btn btn-primary glow-btn" style="margin-bottom: 15px;" onclick="loginMgmt()">AUTHENTICATE</button>
-                <button class="btn btn-text" style="width: 100%;" onclick="showView('view-selector')">← Back</button>
+            <div class="input-group">
+                <label for="connect-dist">Connection Distance (<span id="dist-val">120</span>px)</label>
+                <input type="range" id="connect-dist" min="50" max="300" value="120">
             </div>
-        </div>
 
-        <div id="view-fan-dash" class="view">
-            <div class="glass-card">
-                <div class="dash-header">
-                    <div>
-                        <h2 style="font-size: 32px;">Welcome, <span id="displayFanName" style="color: var(--accent);">Fan</span></h2>
-                        <p class="text-muted" style="margin-top: 5px;">Ticket ID: <span id="displayFanTicket" style="color: var(--accent-cyan); font-family: monospace;">TKT-000</span></p>
-                    </div>
-                    <div class="status-badge success">Live Sync Active</div>
-                </div>
-                
-                <div id="normal-fan-view" class="grid-2">
-                    <div class="inner-card text-center hover-lift" style="border: 1px solid rgba(57, 255, 136, 0.3);">
-                        <p class="text-muted" style="font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 11px;">Optimal Entry Route</p>
-                        <h1 style="font-size: 56px; color: var(--accent); margin: 15px 0; text-shadow: 0 0 30px rgba(57, 255, 136, 0.3);">GATE 3</h1>
-                        <p style="color: var(--accent); font-weight: 500; font-size: 14px;">Estimated wait time: < 2 mins</p>
-                    </div>
-
-                    <div class="inner-card hover-lift">
-                        <h3 style="color: var(--text-primary); font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                            <span class="logo-dot"></span> AI Navigation Assistant
-                        </h3>
-                        <p class="text-muted" style="margin-bottom: 25px; line-height: 1.7; font-weight: 300;">
-                            Your path is clear. Avoid Gate 2 as we are detecting a sudden surge in traffic. Food and beverage lines near Gate 3 are currently empty. Proceed with ease.
-                        </p>
-                        <button class="btn btn-outline" style="padding: 12px; font-size: 12px; width: 100%;" onclick="alert('Support staff dispatched to your location.')">Request Assistance</button>
-                    </div>
-                </div>
-
-                <div id="evac-fan-view" class="inner-card" style="display: none; text-align: center; border-color: rgba(255, 77, 77, 0.3); background: rgba(255, 77, 77, 0.05); box-shadow: 0 0 40px rgba(255, 77, 77, 0.1);">
-                    <h1 style="color: var(--danger); font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255, 77, 77, 0.4);">⚠ EVACUATE NOW</h1>
-                    <p style="font-size: 18px; color: var(--text-primary); font-weight: 300; line-height: 1.6;">Please leave your belongings and walk calmly to the nearest open exit.<br>Follow stadium staff instructions.</p>
-                </div>
+            <div class="toggle-group">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-lines" checked>
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Show Connections</span>
             </div>
+
+            <button id="btn-reset" class="btn-outline">Reset Simulation</button>
         </div>
-
-        <div id="view-mgmt-dash" class="view">
-            <div class="glass-card">
-                <div class="dash-header">
-                    <div>
-                        <h2 style="font-size: 28px;">Stadium Analytics Command</h2>
-                        <p class="text-muted" style="margin-top: 5px; font-weight: 300;">Live Crowd Topology & AI Routing Matrix</p>
-                    </div>
-                    <div class="status-badge success">Network Secured</div>
-                </div>
-                
-                <div class="grid-2">
-                    <div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
-                            <div class="inner-card text-center hover-lift">
-                                <p class="text-muted" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Gate 1 (Normal)</p>
-                                <h3 style="color: var(--text-primary); font-size: 32px; margin-top: 5px;">45</h3>
-                            </div>
-                            <div class="inner-card text-center hover-lift" style="border-color: rgba(255, 181, 71, 0.3); background: rgba(255, 181, 71, 0.05);">
-                                <p style="color: var(--warning); font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Gate 2 (Surge)</p>
-                                <h3 style="color: var(--warning); font-size: 32px; margin-top: 5px; text-shadow: 0 0 15px rgba(255, 181, 71, 0.3);">128</h3>
-                            </div>
-                            <div class="inner-card text-center hover-lift" style="border-color: rgba(57, 255, 136, 0.2);">
-                                <p class="text-muted" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Gate 3 (Optimal)</p>
-                                <h3 style="color: var(--accent); font-size: 32px; margin-top: 5px; text-shadow: 0 0 15px rgba(57, 255, 136, 0.3);">12</h3>
-                            </div>
-                            <div class="inner-card text-center hover-lift">
-                                <p class="text-muted" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Gate 4 (Normal)</p>
-                                <h3 style="color: var(--text-primary); font-size: 32px; margin-top: 5px;">67</h3>
-                            </div>
-                        </div>
-
-                        <div class="inner-card">
-                            <p class="text-muted" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Live Ingress Rate Matrix</p>
-                            <canvas id="ingress-graph" width="400" height="90" style="width: 100%; height: 90px;"></canvas>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <a href="simulation.html" target="_blank" style="text-decoration: none;">
-                            <div class="inner-card hover-lift" style="border-color: rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.03);">
-                                <h3 style="color: var(--accent-cyan); margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 10px;">
-                                    <span class="live-dot" style="background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan);"></span> Launch 3D Digital Twin ⧉
-                                </h3>
-                                <p class="text-muted" style="font-size: 12px; font-weight: 300; line-height: 1.5;">Open the real-time interactive Three.js physics simulation in a new environment.</p>
-                            </div>
-                        </a>
-
-                        <div class="inner-card" style="flex: 1; display: flex; flex-direction: column;">
-                            <p class="text-muted" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Predictive AI Logs</p>
-                            <div class="ai-log" id="aiLogBox"></div>
-                        </div>
-                        
-                        <button class="btn btn-evac" onclick="triggerEvacuation()">⚠ INITIATE EMERGENCY EVACUATION</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
-
-    <footer class="cyber-footer">
-        <div class="footer-content">
-            <div class="support-info">
-                <span>✉ support@smartfanpass.com</span>
-                <span class="divider">|</span>
-                <span>✆ +91 1800-555-0199</span>
-                <span class="divider">|</span>
-                <a href="#" class="help-link">Help Center & FAQ</a>
-            </div>
-            <div class="sys-status">
-                System Status: <span class="status-indicator"></span> Optimal
-            </div>
-        </div>
-    </footer>
 
 </body>
 </html>
