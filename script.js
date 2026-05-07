@@ -30,31 +30,25 @@ function animateParticles() {
     for(let i=0; i<particles.length; i++) {
         let p = particles[i];
         
-        // Move nodes
         p.x += p.dx; 
         p.y += p.dy;
         
-        // Soft bounce on edges
         if(p.x < 0 || p.x > width) p.dx *= -1;
         if(p.y < 0 || p.y > height) p.dy *= -1;
         
-        // Draw the glowing cyan nodes
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(0, 229, 255, ${p.opacity})`;
         ctx.fill();
 
-        // Draw intricate data connections (Neural Network web)
         for(let j=i+1; j<particles.length; j++) {
             let p2 = particles[j];
             let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
             
-            // Connect if nodes are close enough
             if(dist < 140) {
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(p2.x, p2.y);
-                // Line gets brighter as nodes get closer
                 ctx.strokeStyle = `rgba(0, 229, 255, ${0.15 - dist/1000})`; 
                 ctx.lineWidth = 0.6;
                 ctx.stroke();
@@ -71,6 +65,8 @@ window.addEventListener('resize', () => {
 });
 
 // --- 3. SYSTEM LOGIC & ROUTING ---
+let globalEvacuationState = false;
+
 function showView(viewId) {
     const views = document.querySelectorAll('.view');
     views.forEach(v => v.classList.remove('active'));
@@ -78,6 +74,10 @@ function showView(viewId) {
 
     const logoutBtn = document.getElementById('logoutBtn');
     logoutBtn.style.display = (viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') ? 'none' : 'block';
+
+    if(viewId === 'view-fan-dash') applyEvacuationStateToFan();
+    if(viewId === 'view-mgmt-dash') { startGraph(); startAILogs(); }
+    else { stopGraph(); stopAILogs(); }
 }
 
 function loginFan() {
@@ -100,3 +100,86 @@ function logout() {
     document.getElementById('adminPin').value = '';
     showView('view-selector');
 }
+
+// --- 4. EVACUATION LOGIC ---
+function triggerEvacuation() {
+    if(confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?")) {
+        globalEvacuationState = true;
+        document.getElementById('evac-banner').style.display = 'block';
+        addAILog("SYSTEM OVERRIDE: Evacuation Triggered by Command.", "danger");
+        alert("Protocol Initiated. All Smart Passes synced to Evacuation Mode.");
+    }
+}
+
+function applyEvacuationStateToFan() {
+    if(globalEvacuationState) {
+        document.getElementById('normal-fan-view').style.display = 'none';
+        document.getElementById('evac-fan-view').style.display = 'block';
+        document.getElementById('evac-banner').style.display = 'block';
+    } else {
+        document.getElementById('normal-fan-view').style.display = 'grid';
+        document.getElementById('evac-fan-view').style.display = 'none';
+        document.getElementById('evac-banner').style.display = 'none';
+    }
+}
+
+// --- 5. LIVE AI LOG GENERATOR ---
+let aiLogInterval;
+const logPhrases = [
+    "Recalibrating spatial grid mapping...", "Thermal sensors indicate optimal temps in Sector B.",
+    "Gate 4 throughput steady at 12 fans/min.", "Anomaly detected in VIP lounge. Re-routing staff.",
+    "Drone swarm 2 returning for battery cycle.", "Predictive model shows 4% traffic increase next over.",
+    "Network handshake secure with Local Transit API."
+];
+
+function addAILog(message, type = "normal") {
+    const logBox = document.getElementById('aiLogBox');
+    if(!logBox) return;
+    const timeString = new Date().toLocaleTimeString().split(' ')[0];
+    let colorClass = type === "warning" ? "warning" : (type === "danger" ? "danger" : "");
+    logBox.innerHTML += `<div class="ai-msg ${colorClass}"><span class="time">[${timeString}]</span> ${message}</div>`;
+    if (logBox.children.length > 50) logBox.removeChild(logBox.firstChild);
+    logBox.scrollTo({ top: logBox.scrollHeight, behavior: 'smooth' });
+}
+
+function startAILogs() {
+    const logBox = document.getElementById('aiLogBox');
+    if(logBox) logBox.innerHTML = '';
+    addAILog("System boot sequence initialized."); addAILog("Real-time spatial tracking online.");
+    aiLogInterval = setInterval(() => {
+        if(globalEvacuationState) return;
+        const phrase = logPhrases[Math.floor(Math.random() * logPhrases.length)];
+        addAILog(phrase, Math.random() > 0.9 ? "warning" : "normal");
+    }, 4000 + Math.random() * 4000);
+}
+function stopAILogs() { if(aiLogInterval) clearInterval(aiLogInterval); }
+
+// --- 6. SMOOTH LIVE GRAPH ---
+let graphInterval;
+function startGraph() {
+    const gCanvas = document.getElementById('ingress-graph');
+    if(!gCanvas) return;
+    const gCtx = gCanvas.getContext('2d');
+    let data = Array.from({length: 40}, () => 40);
+    let currentTarget = 40;
+
+    graphInterval = setInterval(() => {
+        if(Math.random() > 0.8) currentTarget = Math.random() * 50 + 10; 
+        let nextVal = data[data.length - 1] + (currentTarget - data[data.length - 1]) * 0.2;
+        data.shift(); data.push(nextVal); 
+
+        gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gCtx.beginPath(); gCtx.strokeStyle = '#00E5FF'; gCtx.lineWidth = 2; gCtx.lineJoin = 'round';
+        const widthStep = gCanvas.width / (data.length - 1);
+        
+        for(let i = 0; i < data.length; i++) {
+            const x = i * widthStep; const y = gCanvas.height - data[i]; 
+            if(i === 0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y);
+        }
+        gCtx.stroke(); gCtx.lineTo(gCanvas.width, gCanvas.height); gCtx.lineTo(0, gCanvas.height); gCtx.closePath();
+        const gradient = gCtx.createLinearGradient(0, 0, 0, gCanvas.height);
+        gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
+        gCtx.fillStyle = gradient; gCtx.fill();
+    }, 500); 
+}
+function stopGraph() { if(graphInterval) clearInterval(graphInterval); }
