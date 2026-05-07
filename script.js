@@ -1,144 +1,185 @@
-const canvas = document.getElementById('sim-canvas');
+// --- 1. INTERACTIVE MOUSE GLOW ---
+const mouseGlow = document.getElementById('mouse-glow');
+document.addEventListener('mousemove', (e) => {
+    mouseGlow.style.left = e.clientX + 'px';
+    mouseGlow.style.top = e.clientY + 'px';
+});
+
+// --- 2. ORGANIC NEURAL NETWORK PATTERN ---
+const canvas = document.getElementById('particle-canvas');
 const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
 
-// UI Elements
-const countSlider = document.getElementById('particle-count');
-const speedSlider = document.getElementById('speed-mult');
-const distSlider = document.getElementById('connect-dist');
-const linesToggle = document.getElementById('toggle-lines');
-const resetBtn = document.getElementById('btn-reset');
-
-// Value Displays
-const countVal = document.getElementById('count-val');
-const speedVal = document.getElementById('speed-val');
-const distVal = document.getElementById('dist-val');
-
-// Simulation State
-let particles = [];
-let params = {
-    count: parseInt(countSlider.value),
-    speedMult: parseFloat(speedSlider.value),
-    maxDist: parseInt(distSlider.value),
-    showLines: linesToggle.checked
-};
-
-// Resize Canvas
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+const particles = [];
+// Generate cybernetic nodes
+for(let i=0; i<75; i++) {
+    particles.push({
+        x: Math.random() * width, 
+        y: Math.random() * height,
+        r: Math.random() * 2 + 0.5,
+        dx: (Math.random() - 0.5) * 0.7, 
+        dy: (Math.random() - 0.5) * 0.7,
+        opacity: Math.random() * 0.6 + 0.2
+    });
 }
-window.addEventListener('resize', resize);
-resize();
 
-// Particle Class
-class Particle {
-    constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        // Base velocity (between -1 and 1)
-        this.baseVx = (Math.random() - 0.5) * 2;
-        this.baseVy = (Math.random() - 0.5) * 2;
-        this.radius = Math.random() * 2 + 1;
-    }
-
-    update() {
-        // Apply speed multiplier
-        this.x += this.baseVx * params.speedMult;
-        this.y += this.baseVy * params.speedMult;
-
-        // Bounce off edges
-        if (this.x < 0 || this.x > canvas.width) this.baseVx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.baseVy *= -1;
-    }
-
-    draw() {
+function animateParticles() {
+    ctx.clearRect(0, 0, width, height);
+    
+    for(let i=0; i<particles.length; i++) {
+        let p = particles[i];
+        
+        p.x += p.dx; 
+        p.y += p.dy;
+        
+        if(p.x < 0 || p.x > width) p.dx *= -1;
+        if(p.y < 0 || p.y > height) p.dy *= -1;
+        
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#00E5FF';
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${p.opacity})`;
         ctx.fill();
-    }
-}
 
-// Initialize Particle Array
-function initParticles() {
-    particles = [];
-    for (let i = 0; i < params.count; i++) {
-        particles.push(new Particle());
-    }
-}
-
-// Main Animation Loop
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Update and draw connections first (so they are under particles)
-    for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-
-        if (params.showLines) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distance = Math.hypot(dx, dy);
-
-                if (distance < params.maxDist) {
-                    // Opacity gets stronger the closer they are
-                    const opacity = 1 - (distance / params.maxDist);
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(0, 229, 255, ${opacity * 0.5})`; // Max opacity 0.5
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
+        for(let j=i+1; j<particles.length; j++) {
+            let p2 = particles[j];
+            let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            
+            if(dist < 140) {
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = `rgba(0, 229, 255, ${0.15 - dist/1000})`; 
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
             }
         }
-        
-        // Draw particle on top
-        particles[i].draw();
     }
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
 
-    requestAnimationFrame(animate);
+window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+});
+
+// --- 3. SYSTEM LOGIC & ROUTING ---
+let globalEvacuationState = false;
+
+function showView(viewId) {
+    const views = document.querySelectorAll('.view');
+    views.forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.style.display = (viewId === 'view-selector' || viewId === 'view-fan-login' || viewId === 'view-mgmt-login') ? 'none' : 'block';
+
+    if(viewId === 'view-fan-dash') applyEvacuationStateToFan();
+    if(viewId === 'view-mgmt-dash') { startGraph(); startAILogs(); }
+    else { stopGraph(); stopAILogs(); }
 }
 
-// Event Listeners for Controls
-countSlider.addEventListener('input', (e) => {
-    params.count = parseInt(e.target.value);
-    countVal.innerText = params.count;
-    initParticles(); // Rebuild array when count changes
-});
+function loginFan() {
+    const name = document.getElementById('fanName').value;
+    const ticket = document.getElementById('fanTicket').value;
+    if(!name || !ticket) { alert("Authentication Failed: Please provide valid credentials."); return; }
+    document.getElementById('displayFanName').innerText = name;
+    showView('view-fan-dash');
+}
 
-speedSlider.addEventListener('input', (e) => {
-    params.speedMult = parseFloat(e.target.value);
-    speedVal.innerText = params.speedMult.toFixed(1);
-});
+function loginMgmt() {
+    const pin = document.getElementById('adminPin').value;
+    if(pin === "1234") showView('view-mgmt-dash');
+    else alert("Authentication Failed: Invalid Admin PIN.");
+}
 
-distSlider.addEventListener('input', (e) => {
-    params.maxDist = parseInt(e.target.value);
-    distVal.innerText = params.maxDist;
-});
+function logout() {
+    document.getElementById('fanName').value = '';
+    document.getElementById('fanTicket').value = '';
+    document.getElementById('adminPin').value = '';
+    showView('view-selector');
+}
 
-linesToggle.addEventListener('change', (e) => {
-    params.showLines = e.target.checked;
-});
+// --- 4. EVACUATION LOGIC ---
+function triggerEvacuation() {
+    if(confirm("CRITICAL WARNING: Initiate stadium-wide evacuation protocol?")) {
+        globalEvacuationState = true;
+        document.getElementById('evac-banner').style.display = 'block';
+        addAILog("SYSTEM OVERRIDE: Evacuation Triggered by Command.", "danger");
+        alert("Protocol Initiated. All Smart Passes synced to Evacuation Mode.");
+    }
+}
 
-resetBtn.addEventListener('click', () => {
-    // Reset UI
-    countSlider.value = 100;
-    speedSlider.value = 1.0;
-    distSlider.value = 120;
-    linesToggle.checked = true;
-    
-    // Update labels
-    countVal.innerText = "100";
-    speedVal.innerText = "1.0";
-    distVal.innerText = "120";
+function applyEvacuationStateToFan() {
+    if(globalEvacuationState) {
+        document.getElementById('normal-fan-view').style.display = 'none';
+        document.getElementById('evac-fan-view').style.display = 'block';
+        document.getElementById('evac-banner').style.display = 'block';
+    } else {
+        document.getElementById('normal-fan-view').style.display = 'grid';
+        document.getElementById('evac-fan-view').style.display = 'none';
+        document.getElementById('evac-banner').style.display = 'none';
+    }
+}
 
-    // Reset State
-    params = { count: 100, speedMult: 1.0, maxDist: 120, showLines: true };
-    initParticles();
-});
+// --- 5. LIVE AI LOG GENERATOR ---
+let aiLogInterval;
+const logPhrases = [
+    "Recalibrating spatial grid mapping...", "Thermal sensors indicate optimal temps in Sector B.",
+    "Gate 4 throughput steady at 12 fans/min.", "Anomaly detected in VIP lounge. Re-routing staff.",
+    "Drone swarm 2 returning for battery cycle.", "Predictive model shows 4% traffic increase next over.",
+    "Network handshake secure with Local Transit API."
+];
 
-// Start Simulation
-initParticles();
-animate();
+function addAILog(message, type = "normal") {
+    const logBox = document.getElementById('aiLogBox');
+    if(!logBox) return;
+    const timeString = new Date().toLocaleTimeString().split(' ')[0];
+    let colorClass = type === "warning" ? "warning" : (type === "danger" ? "danger" : "");
+    logBox.innerHTML += `<div class="ai-msg ${colorClass}"><span class="time">[${timeString}]</span> ${message}</div>`;
+    if (logBox.children.length > 50) logBox.removeChild(logBox.firstChild);
+    logBox.scrollTo({ top: logBox.scrollHeight, behavior: 'smooth' });
+}
+
+function startAILogs() {
+    const logBox = document.getElementById('aiLogBox');
+    if(logBox) logBox.innerHTML = '';
+    addAILog("System boot sequence initialized."); addAILog("Real-time spatial tracking online.");
+    aiLogInterval = setInterval(() => {
+        if(globalEvacuationState) return;
+        const phrase = logPhrases[Math.floor(Math.random() * logPhrases.length)];
+        addAILog(phrase, Math.random() > 0.9 ? "warning" : "normal");
+    }, 4000 + Math.random() * 4000);
+}
+function stopAILogs() { if(aiLogInterval) clearInterval(aiLogInterval); }
+
+// --- 6. SMOOTH LIVE GRAPH ---
+let graphInterval;
+function startGraph() {
+    const gCanvas = document.getElementById('ingress-graph');
+    if(!gCanvas) return;
+    const gCtx = gCanvas.getContext('2d');
+    let data = Array.from({length: 40}, () => 40);
+    let currentTarget = 40;
+
+    graphInterval = setInterval(() => {
+        if(Math.random() > 0.8) currentTarget = Math.random() * 50 + 10; 
+        let nextVal = data[data.length - 1] + (currentTarget - data[data.length - 1]) * 0.2;
+        data.shift(); data.push(nextVal); 
+
+        gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        gCtx.beginPath(); gCtx.strokeStyle = '#00E5FF'; gCtx.lineWidth = 2; gCtx.lineJoin = 'round';
+        const widthStep = gCanvas.width / (data.length - 1);
+        
+        for(let i = 0; i < data.length; i++) {
+            const x = i * widthStep; const y = gCanvas.height - data[i]; 
+            if(i === 0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y);
+        }
+        gCtx.stroke(); gCtx.lineTo(gCanvas.width, gCanvas.height); gCtx.lineTo(0, gCanvas.height); gCtx.closePath();
+        const gradient = gCtx.createLinearGradient(0, 0, 0, gCanvas.height);
+        gradient.addColorStop(0, 'rgba(0, 229, 255, 0.3)'); gradient.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
+        gCtx.fillStyle = gradient; gCtx.fill();
+    }, 500); 
+}
+function stopGraph() { if(graphInterval) clearInterval(graphInterval); }
