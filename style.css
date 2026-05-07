@@ -1,13 +1,12 @@
-/* ==========================================
-   HIGH-DEF FUTURISTIC UI VARIABLES
-   ========================================== */
 :root {
-    --bg-deep: #02050A;      /* Deepest Black */
-    --bg-blue: #071324;      /* Deep Blue */
-    --accent: #39FF88;       /* Bright Neon Green */
-    --accent-cyan: #00E5FF;  /* Electric Blue/Cyan */
+    --bg-deep: #02050A;      
+    --bg-blue: #071324;      
+    --accent: #39FF88;       
+    --accent-cyan: #00E5FF;  
     --text-primary: #F5F7FA;
     --text-muted: #8B9BB4;
+    --warning: #FFB547;
+    --danger: #FF4D4D;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,9 +21,7 @@ body {
 
 h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-spacing: 0.5px; }
 
-/* ==========================================
-   ATMOSPHERIC BACKGROUND LAYERS
-   ========================================== */
+/* ATMOSPHERIC BACKGROUND LAYERS */
 .bg-gradient {
     position: fixed; inset: 0; z-index: -6; pointer-events: none;
     background: radial-gradient(circle at center, var(--bg-blue) 0%, var(--bg-deep) 85%);
@@ -72,9 +69,7 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
     pointer-events: none; z-index: -2; transform: translate(-50%, -50%); mix-blend-mode: screen;
 }
 
-/* ==========================================
-   MODAL & UI ELEMENTS
-   ========================================== */
+/* MODAL & UI ELEMENTS */
 .navbar { padding: 25px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
 .logo h1 { font-size: 20px; letter-spacing: 4px; text-transform: uppercase; margin: 0; font-weight: 700; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
 .nav-actions { display: flex; align-items: center; gap: 20px; }
@@ -101,6 +96,11 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
     border-radius: 20px; padding: 50px 40px; 
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 229, 255, 0.05);
     transition: transform 0.4s ease;
+}
+
+.inner-card {
+    background: rgba(4, 10, 21, 0.4); border: 1px solid rgba(0, 229, 255, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px; padding: 25px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden;
 }
 
 .hover-lift:hover { transform: translateY(-4px); border-color: rgba(0, 229, 255, 0.4); }
@@ -141,9 +141,34 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 .logout-btn { background: transparent; border: none; color: var(--text-muted); font-family: 'Inter'; font-weight: 500; font-size: 13px; cursor: pointer; display: none; transition: 0.2s;}
 .logout-btn:hover { color: var(--danger); }
 
-/* ==========================================
-   SUPPORT FOOTER
-   ========================================== */
+/* DASHBOARD LAYOUTS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.dash-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; border-bottom: 1px solid rgba(0, 229, 255, 0.15); padding-bottom: 25px; }
+.status-badge { padding: 8px 14px; border-radius: 30px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; backdrop-filter: blur(10px); }
+.status-badge.success { background: rgba(57, 255, 136, 0.05); color: var(--accent); border: 1px solid rgba(57, 255, 136, 0.3); }
+
+/* AI LOGS */
+.ai-log { flex: 1; overflow-y: auto; font-family: 'Inter', monospace; font-size: 12px; color: var(--text-primary); font-weight: 300; height: 200px; padding-right: 10px;}
+.ai-msg { margin-bottom: 16px; padding-left: 14px; border-left: 2px solid rgba(0, 229, 255, 0.3); line-height: 1.5; opacity: 0; animation: fadeInLog 0.5s forwards;}
+.ai-msg .time { color: var(--accent-cyan); font-size: 10px; margin-right: 8px; font-weight: 500;}
+.ai-msg.warning { border-left-color: var(--warning); color: var(--warning); }
+.ai-msg.danger { border-left-color: var(--danger); color: var(--danger); font-weight: bold; }
+
+/* EVACUATION UI */
+.evac-banner {
+    display: none; background: rgba(255, 77, 77, 0.15); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 77, 77, 0.3);
+    color: var(--danger); text-align: center; padding: 18px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 2px;
+    box-shadow: 0 5px 30px rgba(255, 77, 77, 0.2); z-index: 100;
+}
+.btn-evac {
+    background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.3); color: var(--danger);
+    box-shadow: 0 0 15px rgba(255, 77, 77, 0.1); margin-top: 15px;
+}
+.btn-evac:hover { background: rgba(255, 77, 77, 0.15); border-color: var(--danger); color: var(--danger); box-shadow: 0 0 30px rgba(255, 77, 77, 0.3); transform: translateY(-3px); }
+
+/* SUPPORT FOOTER */
 .cyber-footer {
     width: 100%; padding: 15px 40px; background: rgba(4, 10, 21, 0.6); 
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -161,3 +186,4 @@ h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; letter-sp
 
 @keyframes smoothReveal { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(57, 255, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0); } }
+@keyframes fadeInLog { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
